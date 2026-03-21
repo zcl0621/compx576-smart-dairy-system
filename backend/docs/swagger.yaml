@@ -1,0 +1,1723 @@
+basePath: /
+definitions:
+  github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListItem:
+    properties:
+      cow_id:
+        type: string
+      cow_name:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      metric_key:
+        $ref: '#/definitions/model.MetricType'
+      report_id:
+        type: string
+      resolved_at:
+        type: string
+      severity:
+        $ref: '#/definitions/model.AlertSeverity'
+      status:
+        $ref: '#/definitions/model.AlertStatus'
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListItem'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_alert.SummaryResponse:
+    properties:
+      active:
+        type: integer
+      critical:
+        type: integer
+      offline:
+        type: integer
+      warning:
+        type: integer
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginResponse:
+    properties:
+      expires_at:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginUser'
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginUser:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetConfirmRequest:
+    properties:
+      new_password:
+        type: string
+      reset_token:
+        type: string
+    required:
+    - new_password
+    - reset_token
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetRequestEmailRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyRequest:
+    properties:
+      code:
+        type: string
+    required:
+    - code
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyResponse:
+    properties:
+      reset_token:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricResponse:
+    properties:
+      cow_id:
+        type: string
+      range:
+        $ref: '#/definitions/model.MetricRange'
+      series:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint'
+        type: array
+      summary:
+        $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricSummary'
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricSummary:
+    properties:
+      avg:
+        type: number
+      current:
+        type: number
+      max:
+        type: number
+      min:
+        type: number
+      status:
+        $ref: '#/definitions/model.ReportMetricStatus'
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.CreateRequest:
+    properties:
+      age:
+        type: integer
+      can_milking:
+        type: boolean
+      condition:
+        $ref: '#/definitions/model.CowCondition'
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/model.CowStatus'
+      tag:
+        type: string
+    required:
+    - name
+    - tag
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricResponse:
+    properties:
+      cow_id:
+        type: string
+      range:
+        $ref: '#/definitions/model.MetricRange'
+      series:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint'
+        type: array
+      summary:
+        $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricSummary'
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricSummary:
+    properties:
+      avg:
+        type: number
+      current:
+        type: number
+      max:
+        type: number
+      min:
+        type: number
+      status:
+        $ref: '#/definitions/model.ReportMetricStatus'
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.InfoResponse:
+    properties:
+      age:
+        type: integer
+      can_milking:
+        type: boolean
+      condition:
+        $ref: '#/definitions/model.CowCondition'
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/model.CowStatus'
+      tag:
+        type: string
+      updated_at:
+        type: string
+      weight:
+        type: number
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListItem:
+    properties:
+      age:
+        type: integer
+      can_milking:
+        type: boolean
+      condition:
+        $ref: '#/definitions/model.CowCondition'
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/model.CowStatus'
+      tag:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListItem'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint:
+    properties:
+      time:
+        type: string
+      value:
+        type: number
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricResponse:
+    properties:
+      cow_id:
+        type: string
+      range:
+        $ref: '#/definitions/model.MetricRange'
+      series:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint'
+        type: array
+      summary:
+        $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricSummary'
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricSummary:
+    properties:
+      avg_per_session:
+        type: number
+      session_count:
+        type: integer
+      total:
+        type: number
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricResponse:
+    properties:
+      cow_id:
+        type: string
+      range:
+        $ref: '#/definitions/model.MetricRange'
+      series:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementPoint'
+        type: array
+      summary:
+        $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricSummary'
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricSummary:
+    properties:
+      distance_m:
+        type: number
+      point_count:
+        type: integer
+      status:
+        $ref: '#/definitions/model.ReportMetricStatus'
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementPoint:
+    properties:
+      distance_m:
+        type: number
+      time:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricResponse:
+    properties:
+      cow_id:
+        type: string
+      range:
+        $ref: '#/definitions/model.MetricRange'
+      series:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint'
+        type: array
+      summary:
+        $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricSummary'
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricSummary:
+    properties:
+      avg:
+        type: number
+      current:
+        type: number
+      max:
+        type: number
+      min:
+        type: number
+      status:
+        $ref: '#/definitions/model.ReportMetricStatus'
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.UpdateRequest:
+    properties:
+      age:
+        type: integer
+      can_milking:
+        type: boolean
+      condition:
+        $ref: '#/definitions/model.CowCondition'
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/model.CowStatus'
+      tag:
+        type: string
+    required:
+    - id
+    - name
+    - tag
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricResponse:
+    properties:
+      cow_id:
+        type: string
+      range:
+        $ref: '#/definitions/model.MetricRange'
+      series:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint'
+        type: array
+      summary:
+        $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricSummary'
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricSummary:
+    properties:
+      avg:
+        type: number
+      current:
+        type: number
+      max:
+        type: number
+      min:
+        type: number
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListItem:
+    properties:
+      alert_message:
+        type: string
+      blood_oxygen:
+        type: number
+      condition:
+        $ref: '#/definitions/model.CowCondition'
+      heart_rate:
+        type: number
+      id:
+        type: string
+      name:
+        type: string
+      tag:
+        type: string
+      temperature:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListItem'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.SummaryResponse:
+    properties:
+      critical:
+        type: integer
+      normal:
+        type: integer
+      offline:
+        type: integer
+      total_cows:
+        type: integer
+      warning:
+        type: integer
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_report.ListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_report.ReportItem'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_report.ReportItem:
+    properties:
+      cow_id:
+        type: string
+      cow_name:
+        type: string
+      created_at:
+        type: string
+      details:
+        $ref: '#/definitions/model.ReportDetails'
+      id:
+        type: string
+      period_end:
+        type: string
+      period_start:
+        type: string
+      score:
+        type: number
+      summary:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_user.CreateRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_user.DeleteRequest:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_user.InfoResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListItem:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListItem'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdatePasswordRequest:
+    properties:
+      id:
+        type: string
+      password:
+        type: string
+    required:
+    - id
+    - password
+    type: object
+  github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdateRequest:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - id
+    - username
+    type: object
+  model.AlertSeverity:
+    enum:
+    - warning
+    - critical
+    - offline
+    type: string
+    x-enum-varnames:
+    - AlertSeverityWarning
+    - AlertSeverityCritical
+    - AlertSeverityOffline
+  model.AlertStatus:
+    enum:
+    - active
+    - resolved
+    type: string
+    x-enum-varnames:
+    - AlertStatusActive
+    - AlertStatusResolved
+  model.CowCondition:
+    enum:
+    - normal
+    - warning
+    - critical
+    - offline
+    type: string
+    x-enum-varnames:
+    - CowConditionNormal
+    - CowConditionWarning
+    - CowConditionCritical
+    - CowConditionOffline
+  model.CowStatus:
+    enum:
+    - in_farm
+    - sold
+    - inactive
+    type: string
+    x-enum-varnames:
+    - CowStatusInFarm
+    - CowStatusSold
+    - CowStatusInactive
+  model.MetricRange:
+    enum:
+    - 24h
+    - 7d
+    - 30d
+    - all
+    type: string
+    x-enum-varnames:
+    - MetricRange24H
+    - MetricRange7D
+    - MetricRange30D
+    - MetricRangeAll
+  model.MetricType:
+    enum:
+    - temperature
+    - heart_rate
+    - blood_oxygen
+    - latitude
+    - longitude
+    - milk_amount
+    - milking_duration
+    - weight
+    - device
+    type: string
+    x-enum-varnames:
+    - MetricTypeTemperature
+    - MetricTypeHeartRate
+    - MetricTypeBloodOxygen
+    - MetricTypeLatitude
+    - MetricTypeLongitude
+    - MetricTypeMilkAmount
+    - MetricTypeMilkingDuration
+    - MetricTypeWeight
+    - MetricTypeDevice
+  model.MetricUnit:
+    enum:
+    - celsius
+    - bpm
+    - percent
+    - degrees
+    - liters
+    - seconds
+    - kg
+    type: string
+    x-enum-varnames:
+    - MetricUnitCelsius
+    - MetricUnitBPM
+    - MetricUnitPercent
+    - MetricUnitDegrees
+    - MetricUnitLiters
+    - MetricUnitSeconds
+    - MetricUnitKG
+  model.ReportAlert:
+    properties:
+      level:
+        $ref: '#/definitions/model.AlertSeverity'
+      message:
+        type: string
+    type: object
+  model.ReportDetails:
+    properties:
+      alerts:
+        items:
+          $ref: '#/definitions/model.ReportAlert'
+        type: array
+      metrics:
+        items:
+          $ref: '#/definitions/model.ReportMetric'
+        type: array
+      note:
+        type: string
+    type: object
+  model.ReportMetric:
+    properties:
+      key:
+        $ref: '#/definitions/model.MetricType'
+      label:
+        type: string
+      status:
+        $ref: '#/definitions/model.ReportMetricStatus'
+      text:
+        type: string
+      unit:
+        $ref: '#/definitions/model.MetricUnit'
+      value:
+        type: number
+    type: object
+  model.ReportMetricStatus:
+    enum:
+    - normal
+    - warning
+    - critical
+    - offline
+    type: string
+    x-enum-varnames:
+    - ReportMetricStatusNormal
+    - ReportMetricStatusWarning
+    - ReportMetricStatusCritical
+    - ReportMetricStatusOffline
+  runtime_web_server_handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  runtime_web_server_handler.OKResponse:
+    properties:
+      ok:
+        type: boolean
+    type: object
+info:
+  contact: {}
+  description: api for smart dairy cows
+  title: smart dairy api
+  version: "1.0"
+paths:
+  /api/alert/list:
+    get:
+      description: get paged alert list
+      parameters:
+      - default: 1
+        description: page numb
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Cow ID
+        in: query
+        name: cow_id
+        type: string
+      - description: alert level
+        in: query
+        name: severity
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: list alerts
+      tags:
+      - Alert
+  /api/alert/summary:
+    get:
+      description: get active alert counts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_alert.SummaryResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get alert summary
+      tags:
+      - Alert
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login with email and password
+      parameters:
+      - description: login body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      summary: login
+      tags:
+      - Auth
+  /api/auth/password-reset/confirm:
+    post:
+      consumes:
+      - application/json
+      description: reset password with one-time token
+      parameters:
+      - description: password reset confirm body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetConfirmRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      summary: confirm password reset
+      tags:
+      - Auth
+  /api/auth/password-reset/request:
+    post:
+      consumes:
+      - application/json
+      description: send latest password reset code to email
+      parameters:
+      - description: password reset email body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetRequestEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      summary: request password reset code
+      tags:
+      - Auth
+  /api/auth/password-reset/verify:
+    post:
+      consumes:
+      - application/json
+      description: verify reset code and issue one-time reset token
+      parameters:
+      - description: password reset verify body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      summary: verify password reset code
+      tags:
+      - Auth
+  /api/auth/refresh:
+    post:
+      description: get new token for current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: refresh token
+      tags:
+      - Auth
+  /api/cow/create:
+    post:
+      consumes:
+      - application/json
+      description: create one cow
+      parameters:
+      - description: create cow body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: create cow
+      tags:
+      - Cow
+  /api/cow/info:
+    get:
+      description: get one cow by id
+      parameters:
+      - description: Cow ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.InfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get cow info
+      tags:
+      - Cow
+  /api/cow/list:
+    get:
+      description: get paged cow list
+      parameters:
+      - default: 1
+        description: page numb
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: page size
+        in: query
+        name: page_size
+        type: integer
+      - description: cow name
+        in: query
+        name: name
+        type: string
+      - description: cow condition
+        in: query
+        name: condition
+        type: string
+      - description: cow status
+        in: query
+        name: status
+        type: string
+      - default: updated_at
+        description: sort field
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: list cows
+      tags:
+      - Cow
+  /api/cow/metric/blood_oxygen:
+    get:
+      description: get blood oxygen series for one cow
+      parameters:
+      - description: Cow ID
+        in: query
+        name: cow_id
+        required: true
+        type: string
+      - default: 24h
+        description: range
+        enum:
+        - 24h
+        - 7d
+        - 30d
+        - all
+        in: query
+        name: range
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get blood oxygen metric
+      tags:
+      - Cow Metric
+  /api/cow/metric/heart_rate:
+    get:
+      description: get heart rate series for one cow
+      parameters:
+      - description: Cow ID
+        in: query
+        name: cow_id
+        required: true
+        type: string
+      - default: 24h
+        description: range
+        enum:
+        - 24h
+        - 7d
+        - 30d
+        - all
+        in: query
+        name: range
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get heart rate metric
+      tags:
+      - Cow Metric
+  /api/cow/metric/milk_amount:
+    get:
+      description: get milk amount series for one cow
+      parameters:
+      - description: Cow ID
+        in: query
+        name: cow_id
+        required: true
+        type: string
+      - default: 24h
+        description: range
+        enum:
+        - 24h
+        - 7d
+        - 30d
+        - all
+        in: query
+        name: range
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get milk amount metric
+      tags:
+      - Cow Metric
+  /api/cow/metric/movement:
+    get:
+      description: get movement series for one cow
+      parameters:
+      - description: Cow ID
+        in: query
+        name: cow_id
+        required: true
+        type: string
+      - default: 24h
+        description: range
+        enum:
+        - 24h
+        - 7d
+        - 30d
+        - all
+        in: query
+        name: range
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get movement metric
+      tags:
+      - Cow Metric
+  /api/cow/metric/temperature:
+    get:
+      description: get temperature series for one cow
+      parameters:
+      - description: Cow ID
+        in: query
+        name: cow_id
+        required: true
+        type: string
+      - default: 24h
+        description: range
+        enum:
+        - 24h
+        - 7d
+        - 30d
+        - all
+        in: query
+        name: range
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get temperature metric
+      tags:
+      - Cow Metric
+  /api/cow/metric/weight:
+    get:
+      description: get weight series for one cow
+      parameters:
+      - description: Cow ID
+        in: query
+        name: cow_id
+        required: true
+        type: string
+      - default: 24h
+        description: range
+        enum:
+        - 24h
+        - 7d
+        - 30d
+        - all
+        in: query
+        name: range
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get weight metric
+      tags:
+      - Cow Metric
+  /api/cow/update:
+    post:
+      consumes:
+      - application/json
+      description: update one cow
+      parameters:
+      - description: update cow body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: update cow
+      tags:
+      - Cow
+  /api/dashboard/list:
+    get:
+      description: get paged cow list for dashboard
+      parameters:
+      - default: 1
+        description: page numb
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: list dashboard cows
+      tags:
+      - Dashboard
+  /api/dashboard/summary:
+    get:
+      description: get cow counts for dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.SummaryResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get dashboard summary
+      tags:
+      - Dashboard
+  /api/report/latest:
+    get:
+      description: get latest report for one cow
+      parameters:
+      - description: Cow ID
+        in: query
+        name: cow_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_report.ReportItem'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get latest report
+      tags:
+      - Report
+  /api/report/list:
+    get:
+      description: get paged report list
+      parameters:
+      - default: 1
+        description: page numb
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_report.ListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: list reports
+      tags:
+      - Report
+  /api/user/create:
+    post:
+      consumes:
+      - application/json
+      description: create one user
+      parameters:
+      - description: create user body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: create user
+      tags:
+      - User
+  /api/user/delete:
+    post:
+      consumes:
+      - application/json
+      description: delete one user
+      parameters:
+      - description: delete user body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.DeleteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: delete user
+      tags:
+      - User
+  /api/user/info:
+    get:
+      description: get one user by id
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.InfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get user info
+      tags:
+      - User
+  /api/user/list:
+    get:
+      description: get paged user list
+      parameters:
+      - default: 1
+        description: page numb
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: page size
+        in: query
+        name: page_size
+        type: integer
+      - description: user name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: list users
+      tags:
+      - User
+  /api/user/update:
+    post:
+      consumes:
+      - application/json
+      description: update one user
+      parameters:
+      - description: update user body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: update user
+      tags:
+      - User
+  /api/user/update_password:
+    post:
+      consumes:
+      - application/json
+      description: update password for one user
+      parameters:
+      - description: update password body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdatePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: update user password
+      tags:
+      - User
+  /health:
+    get:
+      description: check api is up
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/runtime_web_server_handler.OKResponse'
+      summary: check health
+      tags:
+      - Health
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -19,3 +19,7 @@ func (b *BaseModel) BeforeCreate(tx *gorm.DB) error {
 	b.ID = xid.New().String()
 	return nil
 }
+
+func OrderByUpdatedAt(db *gorm.DB) *gorm.DB {
+	return db.Order("updated_at desc")
+}

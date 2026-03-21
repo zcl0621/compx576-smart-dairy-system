@@ -1,0 +1,2625 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "api for smart dairy cows",
+        "title": "smart dairy api",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/api/alert/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get paged alert list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Alert"
+                ],
+                "summary": "list alerts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page numb",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "alert level",
+                        "name": "severity",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/alert/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get active alert counts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Alert"
+                ],
+                "summary": "get alert summary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_alert.SummaryResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "description": "login with email and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "login",
+                "parameters": [
+                    {
+                        "description": "login body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/password-reset/confirm": {
+            "post": {
+                "description": "reset password with one-time token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "confirm password reset",
+                "parameters": [
+                    {
+                        "description": "password reset confirm body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetConfirmRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/password-reset/request": {
+            "post": {
+                "description": "send latest password reset code to email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "request password reset code",
+                "parameters": [
+                    {
+                        "description": "password reset email body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetRequestEmailRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/password-reset/verify": {
+            "post": {
+                "description": "verify reset code and issue one-time reset token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "verify password reset code",
+                "parameters": [
+                    {
+                        "description": "password reset verify body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/refresh": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get new token for current user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "refresh token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/create": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "create one cow",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow"
+                ],
+                "summary": "create cow",
+                "parameters": [
+                    {
+                        "description": "create cow body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.CreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.OKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/info": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get one cow by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow"
+                ],
+                "summary": "get cow info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.InfoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get paged cow list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow"
+                ],
+                "summary": "list cows",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page numb",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "cow name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "cow condition",
+                        "name": "condition",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "cow status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "updated_at",
+                        "description": "sort field",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/metric/blood_oxygen": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get blood oxygen series for one cow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow Metric"
+                ],
+                "summary": "get blood oxygen metric",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "24h",
+                            "7d",
+                            "30d",
+                            "all"
+                        ],
+                        "type": "string",
+                        "default": "24h",
+                        "description": "range",
+                        "name": "range",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/metric/heart_rate": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get heart rate series for one cow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow Metric"
+                ],
+                "summary": "get heart rate metric",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "24h",
+                            "7d",
+                            "30d",
+                            "all"
+                        ],
+                        "type": "string",
+                        "default": "24h",
+                        "description": "range",
+                        "name": "range",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/metric/milk_amount": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get milk amount series for one cow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow Metric"
+                ],
+                "summary": "get milk amount metric",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "24h",
+                            "7d",
+                            "30d",
+                            "all"
+                        ],
+                        "type": "string",
+                        "default": "24h",
+                        "description": "range",
+                        "name": "range",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/metric/movement": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get movement series for one cow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow Metric"
+                ],
+                "summary": "get movement metric",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "24h",
+                            "7d",
+                            "30d",
+                            "all"
+                        ],
+                        "type": "string",
+                        "default": "24h",
+                        "description": "range",
+                        "name": "range",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/metric/temperature": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get temperature series for one cow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow Metric"
+                ],
+                "summary": "get temperature metric",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "24h",
+                            "7d",
+                            "30d",
+                            "all"
+                        ],
+                        "type": "string",
+                        "default": "24h",
+                        "description": "range",
+                        "name": "range",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/metric/weight": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get weight series for one cow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow Metric"
+                ],
+                "summary": "get weight metric",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "24h",
+                            "7d",
+                            "30d",
+                            "all"
+                        ],
+                        "type": "string",
+                        "default": "24h",
+                        "description": "range",
+                        "name": "range",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cow/update": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update one cow",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cow"
+                ],
+                "summary": "update cow",
+                "parameters": [
+                    {
+                        "description": "update cow body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.UpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.OKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dashboard/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get paged cow list for dashboard",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "list dashboard cows",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page numb",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dashboard/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get cow counts for dashboard",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "get dashboard summary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.SummaryResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/report/latest": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get latest report for one cow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Report"
+                ],
+                "summary": "get latest report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cow ID",
+                        "name": "cow_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_report.ReportItem"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/report/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get paged report list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Report"
+                ],
+                "summary": "list reports",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page numb",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_report.ListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/create": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "create one user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "create user",
+                "parameters": [
+                    {
+                        "description": "create user body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.CreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.OKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/delete": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete one user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "delete user",
+                "parameters": [
+                    {
+                        "description": "delete user body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.DeleteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.OKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/info": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get one user by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "get user info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.InfoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get paged user list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "list users",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page numb",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user name",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/update": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update one user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "update user",
+                "parameters": [
+                    {
+                        "description": "update user body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.OKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/update_password": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update password for one user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "update user password",
+                "parameters": [
+                    {
+                        "description": "update password body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdatePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.OKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "check api is up",
+                "tags": [
+                    "Health"
+                ],
+                "summary": "check health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/runtime_web_server_handler.OKResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListItem": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "cow_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "metric_key": {
+                    "$ref": "#/definitions/model.MetricType"
+                },
+                "report_id": {
+                    "type": "string"
+                },
+                "resolved_at": {
+                    "type": "string"
+                },
+                "severity": {
+                    "$ref": "#/definitions/model.AlertSeverity"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.AlertStatus"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_alert.ListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_alert.SummaryResponse": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "integer"
+                },
+                "critical": {
+                    "type": "integer"
+                },
+                "offline": {
+                    "type": "integer"
+                },
+                "warning": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginUser"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.LoginUser": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetConfirmRequest": {
+            "type": "object",
+            "required": [
+                "new_password",
+                "reset_token"
+            ],
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "reset_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetRequestEmailRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyRequest": {
+            "type": "object",
+            "required": [
+                "code"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_auth.PasswordResetVerifyResponse": {
+            "type": "object",
+            "properties": {
+                "reset_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricResponse": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "range": {
+                    "$ref": "#/definitions/model.MetricRange"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint"
+                    }
+                },
+                "summary": {
+                    "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricSummary"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.BloodOxygenMetricSummary": {
+            "type": "object",
+            "properties": {
+                "avg": {
+                    "type": "number"
+                },
+                "current": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                },
+                "min": {
+                    "type": "number"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.ReportMetricStatus"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.CreateRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "tag"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "can_milking": {
+                    "type": "boolean"
+                },
+                "condition": {
+                    "$ref": "#/definitions/model.CowCondition"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.CowStatus"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricResponse": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "range": {
+                    "$ref": "#/definitions/model.MetricRange"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint"
+                    }
+                },
+                "summary": {
+                    "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricSummary"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.HeartRateMetricSummary": {
+            "type": "object",
+            "properties": {
+                "avg": {
+                    "type": "number"
+                },
+                "current": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                },
+                "min": {
+                    "type": "number"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.ReportMetricStatus"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.InfoResponse": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "can_milking": {
+                    "type": "boolean"
+                },
+                "condition": {
+                    "$ref": "#/definitions/model.CowCondition"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.CowStatus"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "weight": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListItem": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "can_milking": {
+                    "type": "boolean"
+                },
+                "condition": {
+                    "$ref": "#/definitions/model.CowCondition"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.CowStatus"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.ListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricResponse": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "range": {
+                    "$ref": "#/definitions/model.MetricRange"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint"
+                    }
+                },
+                "summary": {
+                    "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricSummary"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MilkAmountMetricSummary": {
+            "type": "object",
+            "properties": {
+                "avg_per_session": {
+                    "type": "number"
+                },
+                "session_count": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricResponse": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "range": {
+                    "$ref": "#/definitions/model.MetricRange"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementPoint"
+                    }
+                },
+                "summary": {
+                    "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricSummary"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementMetricSummary": {
+            "type": "object",
+            "properties": {
+                "distance_m": {
+                    "type": "number"
+                },
+                "point_count": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.ReportMetricStatus"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MovementPoint": {
+            "type": "object",
+            "properties": {
+                "distance_m": {
+                    "type": "number"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricResponse": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "range": {
+                    "$ref": "#/definitions/model.MetricRange"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint"
+                    }
+                },
+                "summary": {
+                    "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricSummary"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.TemperatureMetricSummary": {
+            "type": "object",
+            "properties": {
+                "avg": {
+                    "type": "number"
+                },
+                "current": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                },
+                "min": {
+                    "type": "number"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.ReportMetricStatus"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.UpdateRequest": {
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "tag"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "can_milking": {
+                    "type": "boolean"
+                },
+                "condition": {
+                    "$ref": "#/definitions/model.CowCondition"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.CowStatus"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricResponse": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "range": {
+                    "$ref": "#/definitions/model.MetricRange"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.MetricPoint"
+                    }
+                },
+                "summary": {
+                    "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricSummary"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_cow.WeightMetricSummary": {
+            "type": "object",
+            "properties": {
+                "avg": {
+                    "type": "number"
+                },
+                "current": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                },
+                "min": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListItem": {
+            "type": "object",
+            "properties": {
+                "alert_message": {
+                    "type": "string"
+                },
+                "blood_oxygen": {
+                    "type": "number"
+                },
+                "condition": {
+                    "$ref": "#/definitions/model.CowCondition"
+                },
+                "heart_rate": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.ListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_dashboard.SummaryResponse": {
+            "type": "object",
+            "properties": {
+                "critical": {
+                    "type": "integer"
+                },
+                "normal": {
+                    "type": "integer"
+                },
+                "offline": {
+                    "type": "integer"
+                },
+                "total_cows": {
+                    "type": "integer"
+                },
+                "warning": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_report.ListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_report.ReportItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_report.ReportItem": {
+            "type": "object",
+            "properties": {
+                "cow_id": {
+                    "type": "string"
+                },
+                "cow_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "details": {
+                    "$ref": "#/definitions/model.ReportDetails"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "period_end": {
+                    "type": "string"
+                },
+                "period_start": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_user.CreateRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_user.DeleteRequest": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_user.InfoResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListItem": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListResponse": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_zcl0621_compx576-smart-dairy-system_dto_user.ListItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdatePasswordRequest": {
+            "type": "object",
+            "required": [
+                "id",
+                "password"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_zcl0621_compx576-smart-dairy-system_dto_user.UpdateRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "id",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AlertSeverity": {
+            "type": "string",
+            "enum": [
+                "warning",
+                "critical",
+                "offline"
+            ],
+            "x-enum-varnames": [
+                "AlertSeverityWarning",
+                "AlertSeverityCritical",
+                "AlertSeverityOffline"
+            ]
+        },
+        "model.AlertStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "resolved"
+            ],
+            "x-enum-varnames": [
+                "AlertStatusActive",
+                "AlertStatusResolved"
+            ]
+        },
+        "model.CowCondition": {
+            "type": "string",
+            "enum": [
+                "normal",
+                "warning",
+                "critical",
+                "offline"
+            ],
+            "x-enum-varnames": [
+                "CowConditionNormal",
+                "CowConditionWarning",
+                "CowConditionCritical",
+                "CowConditionOffline"
+            ]
+        },
+        "model.CowStatus": {
+            "type": "string",
+            "enum": [
+                "in_farm",
+                "sold",
+                "inactive"
+            ],
+            "x-enum-varnames": [
+                "CowStatusInFarm",
+                "CowStatusSold",
+                "CowStatusInactive"
+            ]
+        },
+        "model.MetricRange": {
+            "type": "string",
+            "enum": [
+                "24h",
+                "7d",
+                "30d",
+                "all"
+            ],
+            "x-enum-varnames": [
+                "MetricRange24H",
+                "MetricRange7D",
+                "MetricRange30D",
+                "MetricRangeAll"
+            ]
+        },
+        "model.MetricType": {
+            "type": "string",
+            "enum": [
+                "temperature",
+                "heart_rate",
+                "blood_oxygen",
+                "latitude",
+                "longitude",
+                "milk_amount",
+                "milking_duration",
+                "weight",
+                "device"
+            ],
+            "x-enum-varnames": [
+                "MetricTypeTemperature",
+                "MetricTypeHeartRate",
+                "MetricTypeBloodOxygen",
+                "MetricTypeLatitude",
+                "MetricTypeLongitude",
+                "MetricTypeMilkAmount",
+                "MetricTypeMilkingDuration",
+                "MetricTypeWeight",
+                "MetricTypeDevice"
+            ]
+        },
+        "model.MetricUnit": {
+            "type": "string",
+            "enum": [
+                "celsius",
+                "bpm",
+                "percent",
+                "degrees",
+                "liters",
+                "seconds",
+                "kg"
+            ],
+            "x-enum-varnames": [
+                "MetricUnitCelsius",
+                "MetricUnitBPM",
+                "MetricUnitPercent",
+                "MetricUnitDegrees",
+                "MetricUnitLiters",
+                "MetricUnitSeconds",
+                "MetricUnitKG"
+            ]
+        },
+        "model.ReportAlert": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "$ref": "#/definitions/model.AlertSeverity"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ReportDetails": {
+            "type": "object",
+            "properties": {
+                "alerts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ReportAlert"
+                    }
+                },
+                "metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ReportMetric"
+                    }
+                },
+                "note": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ReportMetric": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "$ref": "#/definitions/model.MetricType"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.ReportMetricStatus"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "unit": {
+                    "$ref": "#/definitions/model.MetricUnit"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "model.ReportMetricStatus": {
+            "type": "string",
+            "enum": [
+                "normal",
+                "warning",
+                "critical",
+                "offline"
+            ],
+            "x-enum-varnames": [
+                "ReportMetricStatusNormal",
+                "ReportMetricStatusWarning",
+                "ReportMetricStatusCritical",
+                "ReportMetricStatusOffline"
+            ]
+        },
+        "runtime_web_server_handler.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "runtime_web_server_handler.OKResponse": {
+            "type": "object",
+            "properties": {
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
