@@ -25,16 +25,20 @@ type ListResponse struct {
 }
 
 type InfoResponse struct {
-	ID         string             `json:"id" gorm:"column:id"`
-	CreatedAt  time.Time          `json:"created_at" gorm:"column:created_at"`
-	UpdatedAt  time.Time          `json:"updated_at" gorm:"column:updated_at"`
-	Name       string             `json:"name" gorm:"column:name"`
-	Tag        string             `json:"tag" gorm:"column:tag"`
-	Age        int                `json:"age" gorm:"column:age"`
-	CanMilking bool               `json:"can_milking" gorm:"column:can_milking"`
-	Status     model.CowStatus    `json:"status" gorm:"column:status"`
-	Condition  model.CowCondition `json:"condition" gorm:"column:condition"`
-	Weight     *float64           `json:"weight" gorm:"-"`
+	ID          string             `json:"id" gorm:"column:id"`
+	CreatedAt   time.Time          `json:"created_at" gorm:"column:created_at"`
+	UpdatedAt   time.Time          `json:"updated_at" gorm:"column:updated_at"`
+	Name        string             `json:"name" gorm:"column:name"`
+	Tag         string             `json:"tag" gorm:"column:tag"`
+	Age         int                `json:"age" gorm:"column:age"`
+	CanMilking  bool               `json:"can_milking" gorm:"column:can_milking"`
+	Status      model.CowStatus    `json:"status" gorm:"column:status"`
+	Condition   model.CowCondition `json:"condition" gorm:"column:condition"`
+	Weight      *float64           `json:"weight" gorm:"-"`
+	Temperature *float64           `json:"temperature" gorm:"-"`
+	HeartRate   *float64           `json:"heart_rate" gorm:"-"`
+	BloodOxygen *float64           `json:"blood_oxygen" gorm:"-"`
+	MilkAmount  *float64           `json:"milk_amount" gorm:"-"`
 }
 
 type MetricPoint struct {

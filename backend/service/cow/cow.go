@@ -55,16 +55,24 @@ func CowInfoService(r *cow.InfoQuery) (*cow.InfoResponse, error) {
 		return nil, err
 	}
 
-	var weight struct {
-		MetricValue float64
+	latestOf := func(metricType model.MetricType) *float64 {
+		var row struct{ MetricValue float64 }
+		if err := pg.DB.Model(&model.Metric{}).
+			Select("metric_value").
+			Where("cow_id = ? AND metric_type = ?", r.ID, metricType).
+			Order("created_at desc").
+			Take(&row).Error; err == nil {
+			v := row.MetricValue
+			return &v
+		}
+		return nil
 	}
-	if err := pg.DB.Model(&model.Metric{}).
-		Select("metric_value").
-		Where("cow_id = ? AND metric_type = ?", r.ID, model.MetricTypeWeight).
-		Order("created_at desc").
-		Take(&weight).Error; err == nil {
-		response.Weight = &weight.MetricValue
-	}
+
+	response.Weight = latestOf(model.MetricTypeWeight)
+	response.Temperature = latestOf(model.MetricTypeTemperature)
+	response.HeartRate = latestOf(model.MetricTypeHeartRate)
+	response.BloodOxygen = latestOf(model.MetricTypeBloodOxygen)
+	response.MilkAmount = latestOf(model.MetricTypeMilkAmount)
 
 	return &response, nil
 }

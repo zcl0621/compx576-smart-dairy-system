@@ -385,8 +385,8 @@ class ChartCard extends StatelessWidget {
     required this.values,
     required this.labels,
     required this.color,
-    required this.minY,
-    required this.maxY,
+    this.minY,
+    this.maxY,
     required this.fractionDigits,
   });
 
@@ -394,8 +394,8 @@ class ChartCard extends StatelessWidget {
   final List<double> values;
   final List<String> labels;
   final Color color;
-  final double minY;
-  final double maxY;
+  final double? minY;
+  final double? maxY;
   final int fractionDigits;
 
   @override

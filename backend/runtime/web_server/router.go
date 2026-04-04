@@ -1,14 +1,30 @@
 package web_server
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zcl0621/compx576-smart-dairy-system/middleware"
 	"github.com/zcl0621/compx576-smart-dairy-system/runtime/web_server/handler"
 )
 
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")
+		c.Header("Access-Control-Max-Age", "86400")
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+		c.Next()
+	}
+}
+
 func NewRouter() *gin.Engine {
 	router := gin.New()
-	router.Use(middleware.RequestLogger(), middleware.Recovery())
+	router.Use(corsMiddleware(), middleware.RequestLogger(), middleware.Recovery())
 
 	h := handler.NewHandler()
 	router.GET("/health", h.Health)

@@ -11,12 +11,18 @@ class LoginCard extends StatelessWidget {
     required this.passwordController,
     required this.hidePassword,
     required this.onTogglePassword,
+    this.onLogin,
+    this.loading = false,
+    this.error,
   });
 
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final bool hidePassword;
   final VoidCallback onTogglePassword;
+  final VoidCallback? onLogin;
+  final bool loading;
+  final String? error;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +50,24 @@ class LoginCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 28),
+              if (error != null) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.critical.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.critical.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Text(
+                    error!,
+                    style: const TextStyle(color: AppColors.critical),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               AppTextField(
                 label: 'Email Address',
                 controller: emailController,
@@ -78,20 +102,21 @@ class LoginCard extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => context.go('/'),
+                  onPressed: onLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                   ),
-                  child: const Text('Sign In'),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                'For demo purposes, click Sign In to continue',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.mutedForeground,
+                  child: loading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Sign In'),
                 ),
               ),
             ],
@@ -121,15 +146,21 @@ class AuthFlowPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-          child: Center(
-            child: Column(
-              children: [
-                ProgressStrip(step: step),
-                const SizedBox(height: 20),
-                AuthCard(title: title, subtitle: subtitle, children: children),
-              ],
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ProgressStrip(step: step),
+                    const SizedBox(height: 20),
+                    AuthCard(title: title, subtitle: subtitle, children: children),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

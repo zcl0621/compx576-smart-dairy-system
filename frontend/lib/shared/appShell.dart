@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/mock/appMockData.dart';
-import '../core/models/appModels.dart';
+import '../core/providers/auth_provider.dart';
+import '../core/providers/data_providers.dart';
 import '../core/theme/appTheme.dart';
 import 'appWidgets.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final compact = isCompact(context);
 
     return Scaffold(
@@ -182,16 +183,15 @@ class _SidebarTile extends StatelessWidget {
   }
 }
 
-class _TopBar extends StatelessWidget {
+class _TopBar extends ConsumerWidget {
   const _TopBar({required this.compact});
 
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
-    final activeAlerts = alerts
-        .where((item) => item.status == AlertStatus.active)
-        .toList();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeAlerts =
+        ref.watch(activeAlertsProvider).valueOrNull ?? [];
 
     return Container(
       height: 68,
@@ -300,6 +300,7 @@ class _TopBar extends StatelessWidget {
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'logout') {
+                ref.read(authProvider.notifier).logout();
                 context.go('/login');
               }
             },

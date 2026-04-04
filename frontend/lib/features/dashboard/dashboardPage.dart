@@ -1,34 +1,30 @@
 import 'package:flutter/material.dart';
-import '../../core/mock/appMockData.dart';
-import '../../core/models/appModels.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/providers/data_providers.dart';
 import '../../core/theme/appTheme.dart';
 import '../../shared/appWidgets.dart';
 import 'dashboardWidgets.dart';
 
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  ConsumerState<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends ConsumerState<DashboardPage> {
   int page = 1;
-  bool isRefreshing = false;
 
-  Future<void> refreshData() async {
-    setState(() => isRefreshing = true);
-    await Future<void>.delayed(const Duration(milliseconds: 520));
-    if (!mounted) return;
-    setState(() => isRefreshing = false);
+  void _refresh() {
+    ref.invalidate(dashboardSummaryProvider);
+    ref.invalidate(dashboardListProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    const perPage = 18;
-    final items = dashboardCows;
-    final totalPages = (items.length / perPage).ceil();
-    final pageItems = items.skip((page - 1) * perPage).take(perPage).toList();
+    final summaryAsync = ref.watch(dashboardSummaryProvider);
+    final listAsync = ref.watch(dashboardListProvider(page));
     final width = MediaQuery.sizeOf(context).width;
     final horizontal = width < 700 ? 16.0 : 24.0;
 
@@ -45,7 +41,7 @@ class _DashboardPageState extends State<DashboardPage> {
               trailing: SizedBox(
                 height: 42,
                 child: OutlinedButton.icon(
-                  onPressed: isRefreshing ? null : refreshData,
+                  onPressed: _refresh,
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     shape: RoundedRectangleBorder(
@@ -53,124 +49,132 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                   icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: Text(isRefreshing ? 'Refreshing' : 'Refresh data'),
+                  label: const Text('Refresh data'),
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final w = constraints.maxWidth;
-                final cols = w > 760
-                    ? 5
-                    : w > 480
-                    ? 3
-                    : 2;
-                return GridView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: cols,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    mainAxisExtent: 100,
-                  ),
+            summaryAsync.when(
+              loading: () => const LoadingStateCard(
+                message: 'Loading summary',
+                lines: 2,
+              ),
+              error: (e, _) => EmptyStateCard(message: 'Failed to load: $e'),
+              data: (summary) => LayoutBuilder(
+                builder: (context, constraints) {
+                  final w = constraints.maxWidth;
+                  final cols = w > 760
+                      ? 5
+                      : w > 480
+                          ? 3
+                          : 2;
+                  return GridView(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      mainAxisExtent: 100,
+                    ),
+                    children: [
+                      DashboardStatCard(
+                        label: 'Total Cows',
+                        value: summary.total_cows,
+                        color: AppColors.foreground,
+                      ),
+                      DashboardStatCard(
+                        label: 'Normal',
+                        value: summary.normal,
+                        color: AppColors.normal,
+                      ),
+                      DashboardStatCard(
+                        label: 'Warning',
+                        value: summary.warning,
+                        color: AppColors.warning,
+                      ),
+                      DashboardStatCard(
+                        label: 'Critical',
+                        value: summary.critical,
+                        color: AppColors.critical,
+                      ),
+                      DashboardStatCard(
+                        label: 'Offline',
+                        value: summary.offline,
+                        color: AppColors.offline,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 28),
+            listAsync.when(
+              loading: () => const LoadingStateCard(
+                message: 'Refreshing dashboard cards',
+                lines: 12,
+              ),
+              error: (e, _) => EmptyStateCard(message: 'Failed to load: $e'),
+              data: (result) {
+                final items = result.list;
+                final totalPages = result.totalPages;
+                return Column(
                   children: [
-                    DashboardStatCard(
-                      label: 'Total Cows',
-                      value: items.length,
-                      color: AppColors.foreground,
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final w = constraints.maxWidth;
+                        final cols = w > 900
+                            ? 3
+                            : w > 580
+                                ? 2
+                                : 1;
+                        final cardWidth = cols == 3
+                            ? (w - 32) / 3
+                            : cols == 2
+                                ? (w - 16) / 2
+                                : w;
+                        if (items.isEmpty) {
+                          return const EmptyStateCard(
+                            message: 'No cows found',
+                          );
+                        }
+                        return Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: items
+                              .map(
+                                (item) => SizedBox(
+                                  width: cardWidth,
+                                  child: DashboardCowCard(item: item),
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
                     ),
-                    DashboardStatCard(
-                      label: 'Normal',
-                      value: items
-                          .where(
-                            (item) => item.condition == CowCondition.normal,
-                          )
-                          .length,
-                      color: AppColors.normal,
-                    ),
-                    DashboardStatCard(
-                      label: 'Warning',
-                      value: items
-                          .where(
-                            (item) => item.condition == CowCondition.warning,
-                          )
-                          .length,
-                      color: AppColors.warning,
-                    ),
-                    DashboardStatCard(
-                      label: 'Critical',
-                      value: items
-                          .where(
-                            (item) => item.condition == CowCondition.critical,
-                          )
-                          .length,
-                      color: AppColors.critical,
-                    ),
-                    DashboardStatCard(
-                      label: 'Offline',
-                      value: items
-                          .where(
-                            (item) => item.condition == CowCondition.offline,
-                          )
-                          .length,
-                      color: AppColors.offline,
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            result.total == 0
+                                ? 'Showing 0 results'
+                                : 'Showing ${(page - 1) * 18 + 1} to ${(page - 1) * 18 + items.length} of ${result.total} results',
+                            style: const TextStyle(
+                              color: AppColors.mutedForeground,
+                            ),
+                          ),
+                        ),
+                        AppPagination(
+                          currentPage: page,
+                          totalPages: totalPages,
+                          onChanged: (value) => setState(() => page = value),
+                        ),
+                      ],
                     ),
                   ],
                 );
               },
-            ),
-            const SizedBox(height: 28),
-            isRefreshing
-                ? const LoadingStateCard(
-                    message: 'Refreshing dashboard cards',
-                    lines: 12,
-                  )
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      final w = constraints.maxWidth;
-                      final cols = w > 900
-                          ? 3
-                          : w > 580
-                          ? 2
-                          : 1;
-                      final cardWidth = cols == 3
-                          ? (w - 32) / 3
-                          : cols == 2
-                          ? (w - 16) / 2
-                          : w;
-                      return Wrap(
-                        spacing: 16,
-                        runSpacing: 16,
-                        children: pageItems
-                            .map(
-                              (item) => SizedBox(
-                                width: cardWidth,
-                                child: DashboardCowCard(item: item),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    },
-                  ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    items.isEmpty
-                        ? 'Showing 0 results'
-                        : 'Showing ${(page - 1) * perPage + 1} to ${((page - 1) * perPage) + pageItems.length} of ${items.length} results',
-                    style: const TextStyle(color: AppColors.mutedForeground),
-                  ),
-                ),
-                AppPagination(
-                  currentPage: page,
-                  totalPages: totalPages,
-                  onChanged: (value) => setState(() => page = value),
-                ),
-              ],
             ),
           ],
         ),

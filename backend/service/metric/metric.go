@@ -112,7 +112,12 @@ func WeightService(r *cowdto.MetricQuery) (*cowdto.WeightMetricResponse, error) 
 		return nil, err
 	}
 
-	rows, err := loadMetricRows(r.CowID, model.MetricTypeWeight, metricRange)
+	// weight is recorded once per day — use 7d lookback for 24h to get enough points
+	weightRange := metricRange
+	if metricRange == model.MetricRange24H {
+		weightRange = model.MetricRange7D
+	}
+	rows, err := loadMetricRows(r.CowID, model.MetricTypeWeight, weightRange)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +138,12 @@ func MilkAmountService(r *cowdto.MetricQuery) (*cowdto.MilkAmountMetricResponse,
 		return nil, err
 	}
 
-	rows, err := loadMetricRows(r.CowID, model.MetricTypeMilkAmount, metricRange)
+	// milk is recorded twice per day — use 7d lookback for 24h to get enough points
+	milkRange := metricRange
+	if metricRange == model.MetricRange24H {
+		milkRange = model.MetricRange7D
+	}
+	rows, err := loadMetricRows(r.CowID, model.MetricTypeMilkAmount, milkRange)
 	if err != nil {
 		return nil, err
 	}
@@ -198,13 +208,15 @@ func MovementService(r *cowdto.MetricQuery) (*cowdto.MovementMetricResponse, err
 		response.UpdatedAt = &updatedAt
 	}
 
+	segmentDistances := make([]cowdto.MovementPoint, 0, len(points))
 	for i := 1; i < len(points); i++ {
 		prev := points[i-1]
 		curr := points[i]
 		distance := util.HaversineMeters(prev.Latitude, prev.Longitude, curr.Latitude, curr.Longitude)
 		response.Summary.DistanceM += distance
-		response.Series = append(response.Series, cowdto.MovementPoint{Time: curr.CreatedAt, DistanceM: distance})
+		segmentDistances = append(segmentDistances, cowdto.MovementPoint{Time: curr.CreatedAt, DistanceM: distance})
 	}
+	response.Series = aggregateMovementSeries(segmentDistances, metricRange)
 
 	projectlog.L().Debug("build movement summary",
 		zap.String("cow_id", r.CowID),
@@ -474,6 +486,39 @@ func statusForMovement(points []movementPointRow) model.ReportMetricStatus {
 		return model.ReportMetricStatusWarning
 	}
 	return model.ReportMetricStatusNormal
+}
+
+// aggregateMovementSeries buckets movement into hourly (24h) or daily points
+func aggregateMovementSeries(segments []cowdto.MovementPoint, metricRange model.MetricRange) []cowdto.MovementPoint {
+	type bucketKey struct{ year, month, day, hour int }
+	buckets := make(map[bucketKey]float64)
+	order := make([]bucketKey, 0)
+
+	for _, seg := range segments {
+		t := seg.Time
+		var key bucketKey
+		if metricRange == model.MetricRange24H {
+			key = bucketKey{t.Year(), int(t.Month()), t.Day(), t.Hour()}
+		} else {
+			key = bucketKey{t.Year(), int(t.Month()), t.Day(), 0}
+		}
+		if _, exists := buckets[key]; !exists {
+			order = append(order, key)
+		}
+		buckets[key] += seg.DistanceM
+	}
+
+	result := make([]cowdto.MovementPoint, 0, len(order))
+	for _, key := range order {
+		var t time.Time
+		if metricRange == model.MetricRange24H {
+			t = time.Date(key.year, time.Month(key.month), key.day, key.hour, 0, 0, 0, time.Local)
+		} else {
+			t = time.Date(key.year, time.Month(key.month), key.day, 0, 0, 0, 0, time.Local)
+		}
+		result = append(result, cowdto.MovementPoint{Time: t, DistanceM: buckets[key]})
+	}
+	return result
 }
 
 func logMetricSummary(metricName string, cowID string, metricRange model.MetricRange, rowCount int, status string, seriesCount int) {

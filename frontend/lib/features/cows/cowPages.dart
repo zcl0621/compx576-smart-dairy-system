@@ -1,41 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/mock/appMockData.dart';
 import '../../core/models/appModels.dart';
+import '../../core/providers/api_provider.dart';
+import '../../core/providers/data_providers.dart';
 import '../../core/theme/appTheme.dart';
 import '../../shared/appWidgets.dart';
 import 'cowWidgets.dart';
 
-class CowsListPage extends StatefulWidget {
+class CowsListPage extends ConsumerStatefulWidget {
   const CowsListPage({super.key});
 
   @override
-  State<CowsListPage> createState() => _CowsListPageState();
+  ConsumerState<CowsListPage> createState() => _CowsListPageState();
 }
 
-class _CowsListPageState extends State<CowsListPage> {
+class _CowsListPageState extends ConsumerState<CowsListPage> {
   String query = '';
   CowCondition? condition;
   CowStatus? status;
   String sortBy = 'Last Updated';
   int page = 1;
 
-  static const pageSize = 10;
-
-  List<CowTableRowData> get allRows => _buildCowTableRows();
+  CowListParams get _params => CowListParams(
+        page: page,
+        pageSize: 10,
+        name: query.isEmpty ? null : query,
+        condition: condition?.name,
+        status: status?.name,
+        sort: sortBy == 'Name' ? 'name' : 'updated_at',
+      );
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final filtered = _getRows();
-    final totalPages = (filtered.length / pageSize).ceil().clamp(1, 999);
-    final currentPage = page.clamp(1, totalPages);
-    _syncPage(currentPage);
-    final pageRows = filtered
-        .skip((currentPage - 1) * pageSize)
-        .take(pageSize)
-        .toList();
+    final listAsync = ref.watch(cowListProvider(_params));
 
     return SingleChildScrollView(
       child: PageSection(
@@ -60,10 +60,19 @@ class _CowsListPageState extends State<CowsListPage> {
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       const SizedBox(height: 6),
-                      Text(
-                        'Showing ${filtered.length} of ${allRows.length} cows',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.mutedForeground,
+                      listAsync.when(
+                        loading: () => Text(
+                          'Loading...',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.mutedForeground,
+                          ),
+                        ),
+                        error: (_, __) => const SizedBox.shrink(),
+                        data: (result) => Text(
+                          'Showing ${result.total} cows',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.mutedForeground,
+                          ),
                         ),
                       ),
                     ],
@@ -216,88 +225,101 @@ class _CowsListPageState extends State<CowsListPage> {
                             ],
                           ),
                   ),
-                  if (width < 980)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: pageRows.isEmpty
-                          ? const Padding(
-                              padding: EdgeInsets.only(bottom: 4),
-                              child: EmptyStateCard(
-                                message: 'No cows match your filters',
-                              ),
-                            )
-                          : Column(
-                              children: pageRows
-                                  .map(
-                                    (cow) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 12,
-                                      ),
-                                      child: CowMobileCard(row: cow),
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                    )
-                  else if (pageRows.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: EmptyStateCard(
-                        message: 'No cows match your filters',
+                  listAsync.when(
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: LoadingStateCard(
+                        message: 'Loading cows',
+                        lines: 5,
                       ),
-                    )
-                  else
-                    CowsTable(rows: pageRows),
+                    ),
+                    error: (e, _) => Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: EmptyStateCard(message: 'Failed to load: $e'),
+                    ),
+                    data: (result) {
+                      final items = result.list;
+                      final pageRows = items
+                          .map(
+                            (cow) => CowTableRowData(
+                              id: cow.id,
+                              tag: cow.tag,
+                              name: cow.name,
+                              canMilking: cow.can_milking,
+                              status: cow.status,
+                              condition: cow.condition,
+                              updatedAt: cow.updated_at,
+                            ),
+                          )
+                          .toList();
+
+                      if (width < 980)
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          child: pageRows.isEmpty
+                              ? const Padding(
+                                  padding: EdgeInsets.only(bottom: 4),
+                                  child: EmptyStateCard(
+                                    message: 'No cows match your filters',
+                                  ),
+                                )
+                              : Column(
+                                  children: pageRows
+                                      .map(
+                                        (cow) => Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
+                                          ),
+                                          child: CowMobileCard(row: cow),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                        );
+                      if (pageRows.isEmpty)
+                        return const Padding(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          child: EmptyStateCard(
+                            message: 'No cows match your filters',
+                          ),
+                        );
+                      return CowsTable(rows: pageRows);
+                    },
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    filtered.isEmpty
-                        ? 'Showing 0 results'
-                        : 'Showing ${(currentPage - 1) * pageSize + 1} to ${((currentPage - 1) * pageSize) + pageRows.length} of ${filtered.length} results',
-                    style: const TextStyle(color: AppColors.mutedForeground),
-                  ),
-                ),
-                if (filtered.isNotEmpty)
-                  AppPagination(
-                    currentPage: currentPage,
-                    totalPages: totalPages,
-                    onChanged: (p) => setState(() => page = p),
-                  ),
-              ],
+            listAsync.when(
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (result) {
+                final items = result.list;
+                final totalPages = result.totalPages;
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        result.total == 0
+                            ? 'Showing 0 results'
+                            : 'Showing ${(page - 1) * 10 + 1} to ${(page - 1) * 10 + items.length} of ${result.total} results',
+                        style: const TextStyle(color: AppColors.mutedForeground),
+                      ),
+                    ),
+                    if (result.total > 0)
+                      AppPagination(
+                        currentPage: page,
+                        totalPages: totalPages,
+                        onChanged: (p) => setState(() => page = p),
+                      ),
+                  ],
+                );
+              },
             ),
           ],
         ),
       ),
     );
-  }
-
-  List<CowTableRowData> _getRows() {
-    final rows = allRows.where((item) {
-      final matchQuery =
-          query.isEmpty ||
-          item.name.toLowerCase().contains(query.toLowerCase()) ||
-          item.tag.toLowerCase().contains(query.toLowerCase());
-      final matchCondition = condition == null || item.condition == condition;
-      final matchStatus = status == null || item.status == status;
-      return matchQuery && matchCondition && matchStatus;
-    }).toList();
-    rows.sort((a, b) {
-      if (sortBy == 'Name') return a.name.compareTo(b.name);
-      return b.updatedAt.compareTo(a.updatedAt);
-    });
-    return rows;
-  }
-
-  void _syncPage(int currentPage) {
-    if (page == currentPage) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => page = currentPage);
-    });
   }
 
   void _changeQuery(String value) {
@@ -326,20 +348,6 @@ class _CowsListPageState extends State<CowsListPage> {
   }
 }
 
-List<CowTableRowData> _buildCowTableRows() {
-  return cows.map((cow) {
-    return CowTableRowData(
-      id: cow.id,
-      tag: cow.tag,
-      name: cow.name,
-      canMilking: cow.can_milking,
-      status: cow.status,
-      condition: cow.condition,
-      updatedAt: cow.updated_at,
-    );
-  }).toList();
-}
-
 class AddCowPage extends StatelessWidget {
   const AddCowPage({super.key});
 
@@ -352,29 +360,32 @@ class AddCowPage extends StatelessWidget {
   );
 }
 
-class EditCowPage extends StatelessWidget {
+class EditCowPage extends ConsumerWidget {
   const EditCowPage({super.key, required this.id});
 
   final String id;
 
   @override
-  Widget build(BuildContext context) {
-    final cow = getCow(id);
-    if (cow == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/cows'));
-      return const SizedBox.shrink();
-    }
-    return CowFormPage(
-      title: 'Edit Cow',
-      subtitle: 'Update the details for ${cow.name}',
-      backLabel: 'Back to cow details',
-      backPath: '/cows/$id',
-      cow: cow,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cowAsync = ref.watch(cowInfoProvider(id));
+    return cowAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/cows'));
+        return const SizedBox.shrink();
+      },
+      data: (cow) => CowFormPage(
+        title: 'Edit Cow',
+        subtitle: 'Update the details for ${cow.name}',
+        backLabel: 'Back to cow details',
+        backPath: '/cows/$id',
+        cow: cow,
+      ),
     );
   }
 }
 
-class CowFormPage extends StatefulWidget {
+class CowFormPage extends ConsumerStatefulWidget {
   const CowFormPage({
     super.key,
     required this.title,
@@ -391,10 +402,10 @@ class CowFormPage extends StatefulWidget {
   final Cow? cow;
 
   @override
-  State<CowFormPage> createState() => _CowFormPageState();
+  ConsumerState<CowFormPage> createState() => _CowFormPageState();
 }
 
-class _CowFormPageState extends State<CowFormPage> {
+class _CowFormPageState extends ConsumerState<CowFormPage> {
   late final nameController = TextEditingController(
     text: widget.cow?.name ?? '',
   );
@@ -404,6 +415,8 @@ class _CowFormPageState extends State<CowFormPage> {
   );
   late bool canMilking = widget.cow?.can_milking ?? true;
   late CowStatus status = widget.cow?.status ?? CowStatus.in_farm;
+  bool loading = false;
+  String? error;
 
   @override
   void dispose() {
@@ -450,6 +463,10 @@ class _CowFormPageState extends State<CowFormPage> {
                 color: AppColors.mutedForeground,
               ),
             ),
+            if (error != null) ...[
+              const SizedBox(height: 16),
+              EmptyStateCard(message: error!),
+            ],
             const SizedBox(height: 24),
             SizedBox(
               width: formWidth,
@@ -509,8 +526,14 @@ class _CowFormPageState extends State<CowFormPage> {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: _saveCow,
-                  child: Text(widget.cow == null ? 'Add Cow' : 'Save Changes'),
+                  onPressed: loading ? null : _saveCow,
+                  child: loading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(widget.cow == null ? 'Add Cow' : 'Save Changes'),
                 ),
                 const SizedBox(width: 14),
                 TextButton(
@@ -528,44 +551,42 @@ class _CowFormPageState extends State<CowFormPage> {
     );
   }
 
-  void _saveCow() {
+  Future<void> _saveCow() async {
     final name = nameController.text.trim();
     final tag = tagController.text.trim();
     final age = int.tryParse(ageController.text.trim()) ?? 0;
-    if (widget.cow == null) {
-      cows.add(
-        Cow(
-          id: 'cow_${DateTime.now().millisecondsSinceEpoch}',
-          name: name.isEmpty ? 'Unnamed' : name,
-          tag: tag.isEmpty ? '-' : tag,
-          age: age,
-          can_milking: canMilking,
-          status: status,
-          condition: CowCondition.normal,
-          updated_at: DateTime.now(),
-          weight: null,
-          milk_amount: null,
-        ),
-      );
-    } else {
-      final index = cows.indexWhere((item) => item.id == widget.cow!.id);
-      if (index != -1) {
-        final oldCow = widget.cow!;
-        cows[index] = Cow(
-          id: oldCow.id,
-          name: name.isEmpty ? oldCow.name : name,
-          tag: tag.isEmpty ? oldCow.tag : tag,
-          age: age > 0 ? age : oldCow.age,
-          can_milking: canMilking,
-          status: status,
-          condition: oldCow.condition,
-          updated_at: DateTime.now(),
-          weight: oldCow.weight,
-          milk_amount: oldCow.milk_amount,
-        );
+    setState(() {
+      loading = true;
+      error = null;
+    });
+    try {
+      final api = ref.read(apiClientProvider);
+      if (widget.cow == null) {
+        await createCow(api, {
+          'name': name.isEmpty ? 'Unnamed' : name,
+          'tag': tag.isEmpty ? '-' : tag,
+          'age': age,
+          'can_milking': canMilking,
+          'status': status.name,
+        });
+      } else {
+        await updateCow(api, {
+          'id': widget.cow!.id,
+          'name': name.isEmpty ? widget.cow!.name : name,
+          'tag': tag.isEmpty ? widget.cow!.tag : tag,
+          'age': age > 0 ? age : widget.cow!.age,
+          'can_milking': canMilking,
+          'status': status.name,
+        });
+        ref.invalidate(cowInfoProvider(widget.cow!.id));
       }
+      ref.invalidate(cowListProvider);
+      if (mounted) context.go(widget.backPath);
+    } catch (e) {
+      if (mounted) setState(() => error = 'Failed to save: $e');
+    } finally {
+      if (mounted) setState(() => loading = false);
     }
-    context.go(widget.backPath);
   }
 }
 
@@ -628,129 +649,43 @@ class _RadioLine<T> extends StatelessWidget {
   }
 }
 
-class CowDetailPage extends StatefulWidget {
+class CowDetailPage extends ConsumerStatefulWidget {
   const CowDetailPage({super.key, required this.id});
 
   final String id;
 
   @override
-  State<CowDetailPage> createState() => _CowDetailPageState();
+  ConsumerState<CowDetailPage> createState() => _CowDetailPageState();
 }
 
-class _CowDetailPageState extends State<CowDetailPage> {
+class _CowDetailPageState extends ConsumerState<CowDetailPage> {
   MetricRange range = MetricRange.h24;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final cow = getCow(widget.id);
-    if (cow == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/cows'));
-      return const SizedBox.shrink();
-    }
-    final cowAlerts = getCowAlerts(widget.id);
-    final cowReports = getCowReports(widget.id);
-    final temperatureSeries = buildMetricSeries(
-      range: range,
-      base: 38.6,
-      step: 0.7,
+    final cowAsync = ref.watch(cowInfoProvider(widget.id));
+
+    return cowAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/cows'));
+        return const SizedBox.shrink();
+      },
+      data: (cow) => _buildDetail(context, cow, width),
     );
-    final heartRateSeries = buildMetricSeries(range: range, base: 73, step: 5);
-    final bloodOxygenSeries = buildMetricSeries(
-      range: range,
-      base: 95.5,
-      step: 1.8,
-    );
-    final weightSeries = buildMetricSeries(
-      range: range,
-      base: cow.weight ?? 600,
-      step: 4.3,
-    );
-    final milkSeries = buildMetricSeries(
-      range: range,
-      base: cow.milk_amount ?? 24,
-      step: 2.2,
-    );
-    final movementSeries = buildMovementSeries(range: range);
-    final charts = [
-      (
-        title: 'Temperature',
-        values: temperatureSeries.map((item) => item.value).toList(),
-        labels: cowChartLabels(
-          temperatureSeries.map((item) => item.time).toList(),
-          range,
-        ),
-        color: AppColors.primary,
-        minY: 37.0,
-        maxY: 41.0,
-        fractionDigits: 0,
-      ),
-      (
-        title: 'Heart Rate',
-        values: heartRateSeries.map((item) => item.value).toList(),
-        labels: cowChartLabels(
-          heartRateSeries.map((item) => item.time).toList(),
-          range,
-        ),
-        color: AppColors.warning,
-        minY: 60.0,
-        maxY: 100.0,
-        fractionDigits: 0,
-      ),
-      (
-        title: 'Blood Oxygen',
-        values: bloodOxygenSeries.map((item) => item.value).toList(),
-        labels: cowChartLabels(
-          bloodOxygenSeries.map((item) => item.time).toList(),
-          range,
-        ),
-        color: AppColors.normal,
-        minY: 90.0,
-        maxY: 100.0,
-        fractionDigits: 0,
-      ),
-      (
-        title: 'Weight',
-        values: weightSeries.map((item) => item.value).toList(),
-        labels: cowChartLabels(
-          weightSeries.map((item) => item.time).toList(),
-          range,
-        ),
-        color: AppColors.accent,
-        minY: (cow.weight ?? 600) - 10,
-        maxY: (cow.weight ?? 600) + 10,
-        fractionDigits: 0,
-      ),
-      (
-        title: 'Milk Production',
-        values: milkSeries.map((item) => item.value).toList(),
-        labels: cowChartLabels(
-          milkSeries.map((item) => item.time).toList(),
-          range,
-        ),
-        color: AppColors.warning,
-        minY: 0.0,
-        maxY: (cow.milk_amount ?? 24) + 5,
-        fractionDigits: 0,
-      ),
-      (
-        title: 'Movement Distance',
-        values: movementSeries.map((item) => item.distance_m).toList(),
-        labels: cowChartLabels(
-          movementSeries.map((item) => item.time).toList(),
-          range,
-        ),
-        color: AppColors.offline,
-        minY: 0.0,
-        maxY: switch (range) {
-          MetricRange.h24 => 2.0,
-          MetricRange.d7 => 10.0,
-          MetricRange.d30 => 20.0,
-          MetricRange.all => 200.0,
-        },
-        fractionDigits: 0,
-      ),
-    ];
+  }
+
+  Widget _buildDetail(BuildContext context, Cow cow, double width) {
+    final metricParams = CowMetricParams(cowId: widget.id, range: range);
+    final tempAsync = ref.watch(temperatureMetricProvider(metricParams));
+    final hrAsync = ref.watch(heartRateMetricProvider(metricParams));
+    final boAsync = ref.watch(bloodOxygenMetricProvider(metricParams));
+    final weightAsync = ref.watch(weightMetricProvider(metricParams));
+    final milkAsync = ref.watch(milkMetricProvider(metricParams));
+    final moveAsync = ref.watch(movementMetricProvider(metricParams));
+    final alertsAsync = ref.watch(cowAlertsProvider(widget.id));
+    final reportAsync = ref.watch(cowReportLatestProvider(widget.id));
 
     return SingleChildScrollView(
       child: PageSection(
@@ -807,21 +742,28 @@ class _CowDetailPageState extends State<CowDetailPage> {
               ).textTheme.titleLarge?.copyWith(fontSize: 20),
             ),
             const SizedBox(height: 16),
-            DetailCardFrame(
-              child: cowAlerts.isEmpty
-                  ? const EmptyStateCard(
-                      message: 'No active alert for this cow',
-                    )
-                  : Column(
-                      children: cowAlerts
-                          .map(
-                            (alert) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: AlertSummaryCard(alert: alert),
-                            ),
-                          )
-                          .toList(),
-                    ),
+            alertsAsync.when(
+              loading: () => const LoadingStateCard(
+                message: 'Loading alerts',
+                lines: 2,
+              ),
+              error: (e, _) => EmptyStateCard(message: 'Failed to load: $e'),
+              data: (cowAlerts) => DetailCardFrame(
+                child: cowAlerts.isEmpty
+                    ? const EmptyStateCard(
+                        message: 'No active alert for this cow',
+                      )
+                    : Column(
+                        children: cowAlerts
+                            .map(
+                              (alert) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: AlertSummaryCard(alert: alert),
+                              ),
+                            )
+                            .toList(),
+                      ),
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -831,19 +773,20 @@ class _CowDetailPageState extends State<CowDetailPage> {
               ).textTheme.titleLarge?.copyWith(fontSize: 20),
             ),
             const SizedBox(height: 16),
-            DetailCardFrame(
-              child: cowReports.isEmpty
-                  ? const EmptyStateCard(message: 'No reports available')
-                  : Column(
-                      children: cowReports
-                          .map(
-                            (report) => Padding(
-                              padding: const EdgeInsets.only(bottom: 14),
-                              child: HealthReportSummaryCard(report: report),
-                            ),
-                          )
-                          .toList(),
-                    ),
+            reportAsync.when(
+              loading: () => const LoadingStateCard(
+                message: 'Loading report',
+                lines: 3,
+              ),
+              error: (e, _) => EmptyStateCard(message: 'Failed to load: $e'),
+              data: (report) => DetailCardFrame(
+                child: report == null
+                    ? const EmptyStateCard(message: 'No reports available')
+                    : Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: HealthReportSummaryCard(report: report),
+                      ),
+              ),
             ),
             const SizedBox(height: 28),
             Column(
@@ -893,24 +836,49 @@ class _CowDetailPageState extends State<CowDetailPage> {
                         ],
                       ),
                 const SizedBox(height: 24),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: charts.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 24),
-                  itemBuilder: (context, index) {
-                    final chart = charts[index];
-                    return ChartCard(
-                      title: chart.title,
-                      values: chart.values,
-                      labels: chart.labels,
-                      color: chart.color,
-                      minY: chart.minY,
-                      maxY: chart.maxY,
-                      fractionDigits: chart.fractionDigits,
-                    );
-                  },
+                _MetricChart(
+                  title: 'Temperature',
+                  asyncValue: tempAsync,
+                  color: AppColors.primary,
+                  minY: 37.0,
+                  maxY: 41.0,
+                  range: range,
                 ),
+                const SizedBox(height: 24),
+                _MetricChart(
+                  title: 'Heart Rate',
+                  asyncValue: hrAsync,
+                  color: AppColors.warning,
+                  minY: 60.0,
+                  maxY: 100.0,
+                  range: range,
+                ),
+                const SizedBox(height: 24),
+                _MetricChart(
+                  title: 'Blood Oxygen',
+                  asyncValue: boAsync,
+                  color: AppColors.normal,
+                  minY: 90.0,
+                  maxY: 100.0,
+                  range: range,
+                ),
+                const SizedBox(height: 24),
+                _MetricChart(
+                  title: 'Weight',
+                  asyncValue: weightAsync,
+                  color: AppColors.accent,
+                  minY: (cow.weight ?? 600) - 10,
+                  maxY: (cow.weight ?? 600) + 10,
+                  range: range,
+                ),
+                const SizedBox(height: 24),
+                _MilkChart(
+                  asyncValue: milkAsync,
+                  range: range,
+                  milkAmount: cow.milk_amount,
+                ),
+                const SizedBox(height: 24),
+                _MovementChart(asyncValue: moveAsync, range: range),
               ],
             ),
             const SizedBox(height: 28),
@@ -956,3 +924,106 @@ class _CowDetailPageState extends State<CowDetailPage> {
     );
   }
 }
+
+class _MetricChart extends StatelessWidget {
+  const _MetricChart({
+    required this.title,
+    required this.asyncValue,
+    required this.color,
+    required this.minY,
+    required this.maxY,
+    required this.range,
+  });
+
+  final String title;
+  final AsyncValue<StandardMetricResponse> asyncValue;
+  final Color color;
+  final double minY;
+  final double maxY;
+  final MetricRange range;
+
+  @override
+  Widget build(BuildContext context) {
+    return asyncValue.when(
+      loading: () => LoadingStateCard(message: 'Loading $title', lines: 3),
+      error: (e, _) => EmptyStateCard(message: 'Failed to load $title'),
+      data: (data) => ChartCard(
+        title: title,
+        values: data.series.map((p) => p.value).toList(),
+        labels: cowChartLabels(
+          data.series.map((p) => p.time).toList(),
+          range,
+        ),
+        color: color,
+        minY: minY,
+        maxY: maxY,
+        fractionDigits: 0,
+      ),
+    );
+  }
+}
+
+class _MilkChart extends StatelessWidget {
+  const _MilkChart({
+    required this.asyncValue,
+    required this.range,
+    this.milkAmount,
+  });
+
+  final AsyncValue<MilkMetricResponse> asyncValue;
+  final MetricRange range;
+  final double? milkAmount;
+
+  @override
+  Widget build(BuildContext context) {
+    return asyncValue.when(
+      loading: () => const LoadingStateCard(
+        message: 'Loading Milk Production',
+        lines: 3,
+      ),
+      error: (e, _) =>
+          const EmptyStateCard(message: 'Failed to load Milk Production'),
+      data: (data) => ChartCard(
+        title: 'Milk Production',
+        values: data.series.map((p) => p.value).toList(),
+        labels: cowChartLabels(
+          data.series.map((p) => p.time).toList(),
+          range,
+        ),
+        color: AppColors.warning,
+        fractionDigits: 0,
+      ),
+    );
+  }
+}
+
+class _MovementChart extends StatelessWidget {
+  const _MovementChart({required this.asyncValue, required this.range});
+
+  final AsyncValue<MovementMetricResponse> asyncValue;
+  final MetricRange range;
+
+  @override
+  Widget build(BuildContext context) {
+    return asyncValue.when(
+      loading: () => const LoadingStateCard(
+        message: 'Loading Movement Distance',
+        lines: 3,
+      ),
+      error: (e, _) =>
+          const EmptyStateCard(message: 'Failed to load Movement Distance'),
+      data: (data) => ChartCard(
+        title: 'Movement Distance (m)',
+        values: data.series.map((p) => p.distance_m).toList(),
+        labels: cowChartLabels(
+          data.series.map((p) => p.time).toList(),
+          range,
+        ),
+        color: AppColors.offline,
+        minY: 0.0,
+        fractionDigits: 0,
+      ),
+    );
+  }
+}
+

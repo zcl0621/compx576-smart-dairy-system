@@ -95,29 +95,28 @@ class PageIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final trailingWidgets = trailing == null
-        ? const <Widget>[]
-        : <Widget>[trailing!];
-
-    return Wrap(
-      runSpacing: 16,
-      alignment: WrapAlignment.spaceBetween,
-      crossAxisAlignment: WrapCrossAlignment.center,
+    final titleCol = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 6),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.mutedForeground,
-              ),
-            ),
-          ],
+        Text(title, style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 6),
+        Text(
+          subtitle,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppColors.mutedForeground,
+          ),
         ),
-        ...trailingWidgets,
+      ],
+    );
+
+    if (trailing == null) return titleCol;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(child: titleCol),
+        const SizedBox(width: 16),
+        trailing!,
       ],
     );
   }
@@ -643,11 +642,18 @@ class AppLineChart extends StatelessWidget {
 
     final rawMin = values.reduce((a, b) => a < b ? a : b);
     final rawMax = values.reduce((a, b) => a > b ? a : b);
-    final chartMin = minY ?? rawMin;
-    // ensure maxY > minY to avoid fl_chart assertion error
-    final chartMax = (maxY ?? rawMax).clamp(chartMin + 0.001, double.infinity);
+    final chartMin = (minY != null && minY! < rawMin) ? minY! : rawMin;
+    // always fit actual data — passed minY/maxY are hints for readability only
+    final chartMax = (maxY != null && maxY! > rawMax ? maxY! : rawMax)
+        .clamp(chartMin + 0.001, double.infinity);
     final interval = ((chartMax - chartMin) / 4).abs();
     final safeInterval = interval < 1 ? 1.0 : interval;
+
+    // show ~6 labels max on x-axis to avoid overlap
+    const maxLabels = 6;
+    final xInterval = values.length <= maxLabels
+        ? 1.0
+        : (values.length / maxLabels).ceilToDouble();
 
     return SizedBox(
       height: 250,
@@ -678,15 +684,9 @@ class AppLineChart extends StatelessWidget {
           ),
           gridData: FlGridData(
             show: true,
-            drawVerticalLine: true,
+            drawVerticalLine: false,
             horizontalInterval: safeInterval,
-            verticalInterval: 1,
             getDrawingHorizontalLine: (_) => const FlLine(
-              color: AppColors.border,
-              strokeWidth: 1,
-              dashArray: [2, 2],
-            ),
-            getDrawingVerticalLine: (_) => const FlLine(
               color: AppColors.border,
               strokeWidth: 1,
               dashArray: [2, 2],
@@ -713,7 +713,7 @@ class AppLineChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 28,
-                interval: 1,
+                interval: xInterval,
                 getTitlesWidget: (value, meta) {
                   final index = value.round();
                   if (index < 0 || index >= labels.length) {

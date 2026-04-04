@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/providers/auth_provider.dart';
+import '../../core/services/api_client.dart';
 import '../../core/theme/appTheme.dart';
 import '../../shared/appWidgets.dart';
 import 'authWidgets.dart';
 
-class ForgotPasswordPage extends StatefulWidget {
+/// shared state across the reset flow
+final _resetEmailProvider = StateProvider<String>((ref) => '');
+final _resetTokenProvider = StateProvider<String>((ref) => '');
+
+class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({super.key});
 
   @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  ConsumerState<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   final emailController = TextEditingController();
   bool success = false;
+  bool loading = false;
   String? error;
 
   @override
@@ -44,22 +52,28 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               child: StatusPanel(
                 icon: Icons.error_outline_rounded,
                 color: AppColors.critical,
-                title: 'Email not valid',
+                title: 'Error',
                 message: error!,
               ),
             ),
           AppTextField(
             label: 'Email',
             controller: emailController,
-            hintText: 'manager@smartdairy.local',
+            hintText: 'admin@smartdairy.local',
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _sendCode,
-              child: const Text('Send code'),
+              onPressed: loading ? null : _sendCode,
+              child: loading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Send code'),
             ),
           ),
         ],
@@ -76,31 +90,43 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  void _sendCode() {
+  Future<void> _sendCode() async {
     final email = emailController.text.trim();
     if (!email.contains('@') || !email.contains('.')) {
       setState(() => error = 'Please enter a valid email address');
       return;
     }
     setState(() {
+      loading = true;
       error = null;
-      success = true;
     });
+    try {
+      await ref.read(authProvider.notifier).requestPasswordReset(email);
+      ref.read(_resetEmailProvider.notifier).state = email;
+      if (mounted) setState(() => success = true);
+    } on ApiException catch (e) {
+      if (mounted) setState(() => error = e.message);
+    } catch (e) {
+      if (mounted) setState(() => error = 'Connection failed');
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
   }
 }
 
-class VerifyCodePage extends StatefulWidget {
+class VerifyCodePage extends ConsumerStatefulWidget {
   const VerifyCodePage({super.key});
 
   @override
-  State<VerifyCodePage> createState() => _VerifyCodePageState();
+  ConsumerState<VerifyCodePage> createState() => _VerifyCodePageState();
 }
 
-class _VerifyCodePageState extends State<VerifyCodePage> {
+class _VerifyCodePageState extends ConsumerState<VerifyCodePage> {
   final controllers = List.generate(6, (_) => TextEditingController());
   final focusNodes = List.generate(6, (_) => FocusNode());
   String? error;
   String? note;
+  bool loading = false;
 
   @override
   void dispose() {
@@ -193,7 +219,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
           ),
           child: const Center(
             child: Text(
-              'Only latest code works. Demo code is 123456.',
+              'Only latest code works.',
               style: TextStyle(color: AppColors.mutedForeground),
             ),
           ),
@@ -202,15 +228,20 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => _verifyCode(code),
-            child: const Text('Verify code'),
+            onPressed: loading ? null : () => _verifyCode(code),
+            child: loading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Verify code'),
           ),
         ),
         const SizedBox(height: 10),
         Center(
           child: TextButton(
-            onPressed: () =>
-                setState(() => note = 'New code sent successfully'),
+            onPressed: _resendCode,
             child: const Text('Resend code'),
           ),
         ),
@@ -228,35 +259,63 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     }
   }
 
-  void _verifyCode(String code) {
+  Future<void> _verifyCode(String code) async {
     if (code.length != 6) {
       setState(() => error = 'Please enter the complete 6-digit code');
       return;
     }
-    if (code != '123456') {
-      setState(() => error = 'Invalid or expired code. Please try again.');
-      for (final item in controllers) {
-        item.clear();
+    setState(() {
+      loading = true;
+      error = null;
+    });
+    try {
+      final resetToken =
+          await ref.read(authProvider.notifier).verifyResetCode(code);
+      ref.read(_resetTokenProvider.notifier).state = resetToken;
+      if (mounted) context.go('/reset-password');
+    } on ApiException catch (e) {
+      if (mounted) {
+        setState(() => error = e.message);
+        for (final item in controllers) {
+          item.clear();
+        }
+        focusNodes.first.requestFocus();
       }
-      focusNodes.first.requestFocus();
+    } catch (e) {
+      if (mounted) setState(() => error = 'Connection failed');
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
+  }
+
+  Future<void> _resendCode() async {
+    final email = ref.read(_resetEmailProvider);
+    if (email.isEmpty) {
+      setState(() => note = 'Go back and enter your email first');
       return;
     }
-    context.go('/reset-password');
+    try {
+      await ref.read(authProvider.notifier).requestPasswordReset(email);
+      if (mounted) setState(() => note = 'New code sent successfully');
+    } catch (_) {
+      if (mounted) setState(() => error = 'Failed to resend code');
+    }
   }
 }
 
-class ResetPasswordPage extends StatefulWidget {
+class ResetPasswordPage extends ConsumerStatefulWidget {
   const ResetPasswordPage({super.key});
 
   @override
-  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+  ConsumerState<ResetPasswordPage> createState() => _ResetPasswordPageState();
 }
 
-class _ResetPasswordPageState extends State<ResetPasswordPage> {
+class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
   final passwordController = TextEditingController();
   final confirmController = TextEditingController();
   bool hide1 = true;
   bool hide2 = true;
+  bool loading = false;
   String? error;
 
   @override
@@ -344,20 +403,28 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () =>
-                _updatePassword(hasMinLength, hasLettersAndNumbers, matched),
-            child: const Text('Update password'),
+            onPressed: loading
+                ? null
+                : () =>
+                    _updatePassword(hasMinLength, hasLettersAndNumbers, matched),
+            child: loading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Update password'),
           ),
         ),
       ],
     );
   }
 
-  void _updatePassword(
+  Future<void> _updatePassword(
     bool hasMinLength,
     bool hasLettersAndNumbers,
     bool matched,
-  ) {
+  ) async {
     if (!hasMinLength || !hasLettersAndNumbers) {
       setState(
         () => error =
@@ -369,7 +436,28 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       setState(() => error = 'Passwords do not match');
       return;
     }
-    context.go('/reset-success');
+    final resetToken = ref.read(_resetTokenProvider);
+    if (resetToken.isEmpty) {
+      setState(() => error = 'Reset token missing. Start the flow again.');
+      return;
+    }
+    setState(() {
+      loading = true;
+      error = null;
+    });
+    try {
+      await ref.read(authProvider.notifier).confirmPasswordReset(
+            resetToken,
+            passwordController.text,
+          );
+      if (mounted) context.go('/reset-success');
+    } on ApiException catch (e) {
+      if (mounted) setState(() => error = e.message);
+    } catch (e) {
+      if (mounted) setState(() => error = 'Connection failed');
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
   }
 }
 
