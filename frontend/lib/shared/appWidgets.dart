@@ -95,18 +95,9 @@ class PageIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleCol = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 6),
-        Text(
-          subtitle,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.mutedForeground,
-          ),
-        ),
-      ],
+    final titleCol = Text(
+      title,
+      style: Theme.of(context).textTheme.headlineMedium,
     );
 
     if (trailing == null) return titleCol;

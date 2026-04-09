@@ -1,0 +1,26 @@
+# compiled binaries
+backend/web_server
+backend/agent_server
+backend/agent
+backend/report
+backend/seed
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Flutter
+frontend/.dart_tool/
+frontend/.packages
+frontend/build/
+
+# Go
+*.exe
+*.out
+
+# docs artifacts
+docs/

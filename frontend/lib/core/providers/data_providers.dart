@@ -175,6 +175,18 @@ final movementMetricProvider =
   },
 );
 
+final movementPathProvider =
+    FutureProvider.family<MovementPathResponse, CowMetricParams>(
+  (ref, params) async {
+    final api = ref.watch(apiClientProvider);
+    final json = await api.get('/api/cow/metric/movement_path', query: {
+      'cow_id': params.cowId,
+      'range': metricRangeToQuery(params.range),
+    });
+    return MovementPathResponse.fromJson(json);
+  },
+);
+
 // ── alert ──
 
 final alertSummaryProvider = FutureProvider<AlertSummary>((ref) async {
@@ -247,6 +259,61 @@ final cowAlertsProvider =
       .map((e) => AlertItem.fromJson(e as Map<String, dynamic>))
       .toList();
 });
+
+// ── metric list ──
+
+class MetricListParams {
+  const MetricListParams({
+    this.page = 1,
+    this.pageSize = 20,
+    this.cowId,
+    this.metricType,
+  });
+
+  final int page;
+  final int pageSize;
+  final String? cowId;
+  final String? metricType;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetricListParams &&
+          page == other.page &&
+          pageSize == other.pageSize &&
+          cowId == other.cowId &&
+          metricType == other.metricType;
+
+  @override
+  int get hashCode => Object.hash(page, pageSize, cowId, metricType);
+}
+
+final metricListProvider =
+    FutureProvider.family<PaginatedList<MetricListItem>, MetricListParams>(
+  (ref, params) async {
+    final api = ref.watch(apiClientProvider);
+    final query = <String, String>{
+      'page': params.page.toString(),
+      'page_size': params.pageSize.toString(),
+    };
+    if (params.cowId != null && params.cowId!.isNotEmpty) {
+      query['cow_id'] = params.cowId!;
+    }
+    if (params.metricType != null && params.metricType!.isNotEmpty) {
+      query['metric_type'] = params.metricType!;
+    }
+    final json = await api.get('/api/metric/list', query: query);
+    final list = (json['list'] as List<dynamic>? ?? [])
+        .map((e) => MetricListItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+    return PaginatedList(
+      list: list,
+      page: (json['page'] as num?)?.toInt() ?? 1,
+      total: (json['total'] as num?)?.toInt() ?? 0,
+      totalPages: (json['total_pages'] as num?)?.toInt() ?? 1,
+    );
+  },
+);
 
 // ── report ──
 

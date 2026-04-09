@@ -6,6 +6,7 @@ import '../../features/alerts/alertsPage.dart';
 import '../../features/auth/authPages.dart';
 import '../../features/cows/cowPages.dart';
 import '../../features/dashboard/dashboardPage.dart';
+import '../../features/metrics/metricsPage.dart';
 import '../../features/reports/reportsPage.dart';
 import '../../features/users/userPages.dart';
 import '../../shared/appShell.dart';
@@ -24,10 +25,10 @@ final authInitProvider = FutureProvider<bool>((ref) async {
   return ref.read(authProvider.notifier).tryRefresh();
 });
 
-/// preserves the deep link path across the splash redirect
-final _pendingPathProvider = StateProvider<String?>((ref) => null);
-
 final appRouterProvider = Provider<GoRouter>((ref) {
+  // plain variable instead of StateProvider to avoid modifying provider during build
+  String? pendingPath;
+
   final router = GoRouter(
     initialLocation: '/splash',
     redirect: (context, state) {
@@ -35,7 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (!initDone) {
         if (state.uri.path != '/splash') {
           // save deep link so we can restore it after auth init
-          ref.read(_pendingPathProvider.notifier).state = state.uri.toString();
+          pendingPath = state.uri.toString();
           return '/splash';
         }
         return null;
@@ -51,10 +52,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       if (!auth.isLoggedIn && !onAuthPage) return '/login';
       if (auth.isLoggedIn && (state.uri.path == '/login' || state.uri.path == '/splash')) {
-        final pending = ref.read(_pendingPathProvider);
-        if (pending != null) {
-          ref.read(_pendingPathProvider.notifier).state = null;
-          return pending;
+        if (pendingPath != null) {
+          final p = pendingPath;
+          pendingPath = null;
+          return p;
         }
         return '/';
       }
@@ -114,6 +115,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/alerts',
             pageBuilder: (context, state) => _fadePage(const AlertsPage()),
+          ),
+          GoRoute(
+            path: '/metrics',
+            pageBuilder: (context, state) => _fadePage(const MetricsPage()),
           ),
           GoRoute(
             path: '/reports',

@@ -461,6 +461,91 @@ class MilkMetricResponse {
   final List<MetricPoint> series;
 }
 
+/// GPS path point for movement map
+class MovementPathPoint {
+  const MovementPathPoint({
+    required this.lat,
+    required this.lng,
+    required this.time,
+    required this.staySeconds,
+  });
+
+  factory MovementPathPoint.fromJson(Map<String, dynamic> json) {
+    return MovementPathPoint(
+      lat: (json['lat'] as num?)?.toDouble() ?? 0,
+      lng: (json['lng'] as num?)?.toDouble() ?? 0,
+      time: DateTime.fromMillisecondsSinceEpoch(
+        ((json['time'] as num?)?.toInt() ?? 0) * 1000,
+      ),
+      staySeconds: (json['stay_seconds'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  final double lat;
+  final double lng;
+  final DateTime time;
+  final int staySeconds;
+}
+
+/// movement path response for map
+class MovementPathResponse {
+  const MovementPathResponse({
+    required this.cowId,
+    required this.range,
+    required this.points,
+  });
+
+  factory MovementPathResponse.fromJson(Map<String, dynamic> json) {
+    final rawPoints = json['points'] as List<dynamic>? ?? [];
+    return MovementPathResponse(
+      cowId: json['cow_id']?.toString() ?? '',
+      range: json['range']?.toString() ?? '24h',
+      points: rawPoints
+          .map((e) => MovementPathPoint.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  final String cowId;
+  final String range;
+  final List<MovementPathPoint> points;
+}
+
+class MetricListItem {
+  const MetricListItem({
+    required this.id,
+    required this.cowId,
+    required this.cowName,
+    required this.source,
+    required this.metricType,
+    required this.metricValue,
+    required this.unit,
+    required this.createdAt,
+  });
+
+  factory MetricListItem.fromJson(Map<String, dynamic> json) {
+    return MetricListItem(
+      id: json['id']?.toString() ?? '',
+      cowId: json['cow_id']?.toString() ?? '',
+      cowName: json['cow_name']?.toString() ?? '',
+      source: json['source']?.toString() ?? '',
+      metricType: json['metric_type']?.toString() ?? '',
+      metricValue: (json['metric_value'] as num?)?.toDouble() ?? 0,
+      unit: json['unit']?.toString() ?? '',
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+    );
+  }
+
+  final String id;
+  final String cowId;
+  final String cowName;
+  final String source;
+  final String metricType;
+  final double metricValue;
+  final String unit;
+  final DateTime createdAt;
+}
+
 /// movement metric response
 class MovementMetricResponse {
   const MovementMetricResponse({

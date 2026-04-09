@@ -38,12 +38,22 @@ type ResendConfig struct {
 	From   string `yaml:"from"`
 }
 
+type AgentServerConfig struct {
+	Port int `yaml:"port"`
+}
+
+type AgentConfig struct {
+	AgentServerURL string `yaml:"agent_server_url"`
+}
+
 type Config struct {
-	App    AppConfig    `yaml:"app"`
-	PG     PGConfig     `yaml:"pg"`
-	Redis  RedisConfig  `yaml:"redis"`
-	Resend ResendConfig `yaml:"resend"`
-	JWT    JWTConfig    `yaml:"jwt"`
+	App         AppConfig         `yaml:"app"`
+	PG          PGConfig          `yaml:"pg"`
+	Redis       RedisConfig       `yaml:"redis"`
+	Resend      ResendConfig      `yaml:"resend"`
+	JWT         JWTConfig         `yaml:"jwt"`
+	AgentServer AgentServerConfig `yaml:"agent_server"`
+	Agent       AgentConfig       `yaml:"agent"`
 }
 
 var (

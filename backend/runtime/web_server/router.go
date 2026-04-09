@@ -58,6 +58,7 @@ func registerProtectedRoutes(api *gin.RouterGroup, h *handler.Handler) {
 	registerUserRoutes(api, h)
 	registerReportRoutes(api, h)
 	registerAlertRoutes(api, h)
+	registerMetricRoutes(api, h)
 }
 
 func registerAuthRoutes(api *gin.RouterGroup, h *handler.Handler) {
@@ -84,6 +85,7 @@ func registerCowRoutes(api *gin.RouterGroup, h *handler.Handler) {
 	metricGroup.GET("/blood_oxygen", h.CowMetricBloodOxygen)
 	metricGroup.GET("/milk_amount", h.CowMetricMilkAmount)
 	metricGroup.GET("/movement", h.CowMetricMovement)
+	metricGroup.GET("/movement_path", h.CowMetricMovementPath)
 	metricGroup.GET("/weight", h.CowMetricWeight)
 }
 
@@ -107,4 +109,9 @@ func registerAlertRoutes(api *gin.RouterGroup, h *handler.Handler) {
 	group := api.Group("/alert")
 	group.GET("/summary", h.AlertSummary)
 	group.GET("/list", h.AlertList)
+}
+
+func registerMetricRoutes(api *gin.RouterGroup, h *handler.Handler) {
+	group := api.Group("/metric")
+	group.GET("/list", h.MetricList)
 }

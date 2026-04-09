@@ -132,3 +132,91 @@ func jwtSecret() (string, error) {
 	projectlog.L().Error("jwt secret is empty")
 	return "", ErrBadJWTSecret
 }
+
+const cowTokenTTL = 7 * 24 * time.Hour
+const authCowIDKey = "auth_cow_id"
+
+type cowJWTClaims struct {
+	CowID string `json:"cow_id"`
+	jwt.RegisteredClaims
+}
+
+func GenerateCowToken(cowID string) (string, time.Time, error) {
+	expiresAt := time.Now().Add(cowTokenTTL)
+	claims := cowJWTClaims{
+		CowID: cowID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Subject:   cowID,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secret, err := jwtSecret()
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return tokenString, expiresAt, nil
+}
+
+func ParseCowToken(tokenString string) (*cowJWTClaims, error) {
+	secret, err := jwtSecret()
+	if err != nil {
+		return nil, err
+	}
+
+	claims := &cowJWTClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, ErrBadToken
+		}
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, ErrBadToken
+	}
+	if !token.Valid {
+		return nil, ErrBadToken
+	}
+	if claims.CowID == "" {
+		return nil, ErrBadToken
+	}
+
+	return claims, nil
+}
+
+func NeedCowAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString, err := parseBearerToken(c.GetHeader("Authorization"))
+		if err != nil {
+			c.AbortWithStatusJSON(401, gin.H{"error": err.Error()})
+			return
+		}
+
+		claims, err := ParseCowToken(tokenString)
+		if err != nil {
+			c.AbortWithStatusJSON(401, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.Set(authCowIDKey, claims.CowID)
+		c.Next()
+	}
+}
+
+func GetAuthCowID(c *gin.Context) (string, error) {
+	if value, ok := c.Get(authCowIDKey); ok {
+		cowID, _ := value.(string)
+		if cowID != "" {
+			return cowID, nil
+		}
+	}
+	return "", ErrBadToken
+}

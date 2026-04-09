@@ -141,3 +141,16 @@ type WeightMetricResponse struct {
 	Summary   WeightMetricSummary `json:"summary"`
 	Series    []MetricPoint       `json:"series"`
 }
+
+type MovementPathPoint struct {
+	Lat         float64 `json:"lat"`
+	Lng         float64 `json:"lng"`
+	Time        int64   `json:"time"`
+	StaySeconds int64   `json:"stay_seconds"`
+}
+
+type MovementPathResponse struct {
+	CowID  string              `json:"cow_id"`
+	Range  model.MetricRange   `json:"range"`
+	Points []MovementPathPoint `json:"points"`
+}

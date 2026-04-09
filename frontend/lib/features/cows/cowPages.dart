@@ -8,6 +8,7 @@ import '../../core/providers/data_providers.dart';
 import '../../core/theme/appTheme.dart';
 import '../../shared/appWidgets.dart';
 import 'cowWidgets.dart';
+import 'widgets/movement_map.dart';
 
 class CowsListPage extends ConsumerStatefulWidget {
   const CowsListPage({super.key});
@@ -52,30 +53,9 @@ class _CowsListPageState extends ConsumerState<CowsListPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Cows',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 6),
-                      listAsync.when(
-                        loading: () => Text(
-                          'Loading...',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.mutedForeground,
-                          ),
-                        ),
-                        error: (_, __) => const SizedBox.shrink(),
-                        data: (result) => Text(
-                          'Showing ${result.total} cows',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.mutedForeground,
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Cows',
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -684,6 +664,7 @@ class _CowDetailPageState extends ConsumerState<CowDetailPage> {
     final weightAsync = ref.watch(weightMetricProvider(metricParams));
     final milkAsync = ref.watch(milkMetricProvider(metricParams));
     final moveAsync = ref.watch(movementMetricProvider(metricParams));
+    final pathAsync = ref.watch(movementPathProvider(metricParams));
     final alertsAsync = ref.watch(cowAlertsProvider(widget.id));
     final reportAsync = ref.watch(cowReportLatestProvider(widget.id));
 
@@ -884,36 +865,30 @@ class _CowDetailPageState extends ConsumerState<CowDetailPage> {
             const SizedBox(height: 28),
             Text('Map', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            SurfaceCard(
-              child: Container(
-                height: 380,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(8),
+            pathAsync.when(
+              data: (pathData) => MovementMapCard(response: pathData),
+              loading: () => SurfaceCard(
+                child: SizedBox(
+                  height: 300,
+                  child: Center(child: CircularProgressIndicator()),
                 ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.location_on_outlined,
-                        size: 48,
-                        color: AppColors.mutedForeground,
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Location: -37.7833, 175.2833',
-                        style: TextStyle(color: AppColors.mutedForeground),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Map integration would display here',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.mutedForeground,
+              ),
+              error: (err, _) => SurfaceCard(
+                child: SizedBox(
+                  height: 300,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Failed to load map data',
+                            style: TextStyle(color: AppColors.mutedForeground)),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () => ref.invalidate(movementPathProvider(metricParams)),
+                          child: const Text('Retry'),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

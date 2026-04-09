@@ -5,6 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	cowdto "github.com/zcl0621/compx576-smart-dairy-system/dto/cow"
+	metricdto "github.com/zcl0621/compx576-smart-dairy-system/dto/metric"
+	"github.com/zcl0621/compx576-smart-dairy-system/model"
 	cowservice "github.com/zcl0621/compx576-smart-dairy-system/service/cow"
 	metricservice "github.com/zcl0621/compx576-smart-dairy-system/service/metric"
 )
@@ -287,4 +289,60 @@ func (h *Handler) CowMetricWeight(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+// MetricList godoc
+// @Summary list raw metric records
+// @Description get paginated metric records with optional filtering
+// @Tags Metric
+// @Produce json
+// @Security BearerAuth
+// @Param page query int false "page num" default(1)
+// @Param page_size query int false "page size" default(20)
+// @Param cow_id query string false "cow id"
+// @Param metric_type query string false "metric type"
+// @Success 200 {object} metricdto.ListResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /api/metric/list [get]
+func (h *Handler) MetricList(c *gin.Context) {
+	var query metricdto.ListQuery
+	if !bindQuery(c, &query) {
+		return
+	}
+	resp, err := metricservice.MetricListService(&query)
+	if err != nil {
+		writeError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+// CowMetricMovementPath godoc
+// @Summary get cow movement path for map
+// @Description return GPS path points with stay detection for map rendering
+// @Tags Cow
+// @Security BearerAuth
+// @Param cow_id query string true "cow id"
+// @Param range query string false "range" Enums(24h, 7d, 30d, all) default(24h)
+// @Success 200 {object} cowdto.MovementPathResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /api/cow/metric/movement_path [get]
+func (h *Handler) CowMetricMovementPath(c *gin.Context) {
+	var req cowdto.MetricQuery
+	if !bindQuery(c, &req) {
+		return
+	}
+
+	resp, err := metricservice.MovementPathService(&metricservice.MetricQuery{
+		CowID:       req.CowID,
+		MetricRange: model.MetricRange(req.Range),
+	})
+	if err != nil {
+		writeError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }

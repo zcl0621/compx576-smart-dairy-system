@@ -64,6 +64,7 @@ class _SidebarContent extends StatelessWidget {
       (label: 'Dashboard', path: '/', icon: Icons.dashboard_outlined),
       (label: 'Cows', path: '/cows', icon: Icons.assignment_outlined),
       (label: 'Alerts', path: '/alerts', icon: Icons.warning_amber_outlined),
+      (label: 'Metrics', path: '/metrics', icon: Icons.analytics_outlined),
       (label: 'Reports', path: '/reports', icon: Icons.description_outlined),
       (label: 'Users', path: '/users', icon: Icons.people_outline_rounded),
     ];
