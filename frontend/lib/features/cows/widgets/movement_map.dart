@@ -14,6 +14,12 @@ class MovementMapCard extends StatelessWidget {
   static const _defaultLat = -37.7870;
   static const _defaultLng = 175.2793;
 
+  static TileLayer _osmTileLayer() => TileLayer(
+        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        userAgentPackageName: 'com.compx576.smartdairy',
+        tileProvider: CancellableNetworkTileProvider(),
+      );
+
   @override
   Widget build(BuildContext context) {
     if (response.points.isEmpty) {
@@ -38,11 +44,7 @@ class MovementMapCard extends StatelessWidget {
               ),
             ),
             children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.compx576.smartdairy',
-                tileProvider: CancellableNetworkTileProvider(),
-              ),
+              _osmTileLayer(),
               // movement path line
               PolylineLayer(
                 polylines: [
@@ -85,12 +87,7 @@ class MovementMapCard extends StatelessWidget {
                   initialZoom: 15,
                 ),
                 children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.compx576.smartdairy',
-                    tileProvider: CancellableNetworkTileProvider(),
-                  ),
+                  _osmTileLayer(),
                 ],
               ),
               Center(

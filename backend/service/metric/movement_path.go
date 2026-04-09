@@ -128,9 +128,8 @@ func simplifyPath(points []cowdto.MovementPathPoint, epsilon float64) []cowdto.M
 
 	// run DP, double epsilon if too many points (cap iterations to prevent infinite loop)
 	for range 20 {
-		simplified := util.DouglasPeucker(geoPoints, epsilon)
-		if len(simplified) <= maxPathPoints {
-			geoPoints = simplified
+		geoPoints = util.DouglasPeucker(geoPoints, epsilon)
+		if len(geoPoints) <= maxPathPoints {
 			break
 		}
 		epsilon *= 2

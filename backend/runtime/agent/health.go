@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	projectlog "github.com/zcl0621/compx576-smart-dairy-system/log"
@@ -62,11 +63,20 @@ func (a *healthAgent) sendAll() {
 	lat := farmLat + (rand.Float64()-0.5)*0.002
 	lng := farmLng + (rand.Float64()-0.5)*0.002
 
-	a.send("temperature", temp, "celsius")
-	a.send("heart_rate", hr, "bpm")
-	a.send("blood_oxygen", bo, "percent")
-	a.send("latitude", lat, "degrees")
-	a.send("longitude", lng, "degrees")
+	var wg sync.WaitGroup
+	send := func(mt string, v float64, u string) {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			a.send(mt, v, u)
+		}()
+	}
+	send("temperature", temp, "celsius")
+	send("heart_rate", hr, "bpm")
+	send("blood_oxygen", bo, "percent")
+	send("latitude", lat, "degrees")
+	send("longitude", lng, "degrees")
+	wg.Wait()
 }
 
 func (a *healthAgent) send(metricType string, value float64, unit string) {

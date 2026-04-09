@@ -2,6 +2,7 @@ package mq
 
 import (
 	"context"
+	"strings"
 
 	redisdb "github.com/zcl0621/compx576-smart-dairy-system/db/redis"
 	projectlog "github.com/zcl0621/compx576-smart-dairy-system/log"
@@ -17,7 +18,7 @@ func Init() error {
 
 	// create consumer group, MKSTREAM creates the stream if missing
 	err := client.XGroupCreateMkStream(ctx, StreamName, GroupMetricWriter, "0").Err()
-	if err != nil && err.Error() != "BUSYGROUP Consumer Group name already exists" {
+	if err != nil && !strings.HasPrefix(err.Error(), "BUSYGROUP") {
 		return err
 	}
 
