@@ -51,7 +51,7 @@ func getToken(t *testing.T, router *gin.Engine, cowID string) string {
 func TestToken_ValidCow(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "Daisy", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "Daisy", model.CowStatusInFarm)
 
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("POST", "/api/token?cow_id="+cow.Tag, nil)
@@ -95,7 +95,7 @@ func TestMetric_Success(t *testing.T) {
 	require.NoError(t, mq.Init())
 
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "Bella", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "Bella", model.CowStatusInFarm)
 		router := setupMetricRouter()
 		token := getToken(t, router, cow.Tag)
 
@@ -146,7 +146,7 @@ func TestMetric_CowIDMismatch(t *testing.T) {
 	require.NoError(t, mq.Init())
 
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "Clara", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "Clara", model.CowStatusInFarm)
 		router := setupMetricRouter()
 		token := getToken(t, router, cow.Tag)
 
@@ -174,7 +174,7 @@ func TestMetric_InvalidSource(t *testing.T) {
 	require.NoError(t, mq.Init())
 
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "Dana", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "Dana", model.CowStatusInFarm)
 		router := setupMetricRouter()
 		token := getToken(t, router, cow.Tag)
 
@@ -202,7 +202,7 @@ func TestMetric_InvalidMetricType(t *testing.T) {
 	require.NoError(t, mq.Init())
 
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "Eva", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "Eva", model.CowStatusInFarm)
 		router := setupMetricRouter()
 		token := getToken(t, router, cow.Tag)
 

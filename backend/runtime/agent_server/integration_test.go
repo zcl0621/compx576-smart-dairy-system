@@ -29,7 +29,7 @@ func TestIntegration_PostMetricEndToEnd(t *testing.T) {
 		// at start which deletes the stream and consumer group
 		require.NoError(t, mq.Init())
 
-		cow := testhelper.SeedCow(t, tx, "Fiona", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "Fiona", model.CowStatusInFarm)
 
 		router := agent_server.NewRouter()
 

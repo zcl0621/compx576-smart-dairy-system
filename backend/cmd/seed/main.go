@@ -77,35 +77,34 @@ func seedCows(db *gorm.DB) []string {
 		age        int
 		canMilking bool
 		status     model.CowStatus
-		condition  model.CowCondition
 	}
 
 	defs := []cowDef{
-		{"Bessie", "DC-2401", 5, true, model.CowStatusInFarm, model.CowConditionWarning},
-		{"Daisy", "DC-2402", 4, true, model.CowStatusInFarm, model.CowConditionWarning},
-		{"Clara", "DC-2403", 6, false, model.CowStatusInFarm, model.CowConditionCritical},
-		{"Molly", "DC-2404", 4, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Ella", "DC-2405", 3, true, model.CowStatusInFarm, model.CowConditionOffline},
-		{"Lucy", "DC-2406", 5, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Bella", "DC-2407", 4, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Rose", "DC-2408", 6, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Sophie", "DC-2409", 3, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Rosie", "DC-2410", 5, true, model.CowStatusInFarm, model.CowConditionWarning},
-		{"Maggie", "DC-2411", 4, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Buttercup", "DC-2412", 7, false, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Penny", "DC-2413", 3, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Hazel", "DC-2414", 5, true, model.CowStatusInFarm, model.CowConditionWarning},
-		{"Poppy", "DC-2415", 4, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Clover", "DC-2416", 5, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Willow", "DC-2417", 6, false, model.CowStatusInFarm, model.CowConditionOffline},
-		{"Ginger", "DC-2418", 4, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Honey", "DC-2419", 3, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Luna", "DC-2420", 5, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Annie", "DC-2421", 4, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Ruby", "DC-2422", 6, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Pearl", "DC-2423", 5, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Nora", "DC-2424", 4, true, model.CowStatusInFarm, model.CowConditionNormal},
-		{"Olive", "DC-2425", 3, true, model.CowStatusInFarm, model.CowConditionNormal},
+		{"Bessie", "DC-2401", 5, true, model.CowStatusInFarm},
+		{"Daisy", "DC-2402", 4, true, model.CowStatusInFarm},
+		{"Clara", "DC-2403", 6, false, model.CowStatusInFarm},
+		{"Molly", "DC-2404", 4, true, model.CowStatusInFarm},
+		{"Ella", "DC-2405", 3, true, model.CowStatusInFarm},
+		{"Lucy", "DC-2406", 5, true, model.CowStatusInFarm},
+		{"Bella", "DC-2407", 4, true, model.CowStatusInFarm},
+		{"Rose", "DC-2408", 6, true, model.CowStatusInFarm},
+		{"Sophie", "DC-2409", 3, true, model.CowStatusInFarm},
+		{"Rosie", "DC-2410", 5, true, model.CowStatusInFarm},
+		{"Maggie", "DC-2411", 4, true, model.CowStatusInFarm},
+		{"Buttercup", "DC-2412", 7, false, model.CowStatusInFarm},
+		{"Penny", "DC-2413", 3, true, model.CowStatusInFarm},
+		{"Hazel", "DC-2414", 5, true, model.CowStatusInFarm},
+		{"Poppy", "DC-2415", 4, true, model.CowStatusInFarm},
+		{"Clover", "DC-2416", 5, true, model.CowStatusInFarm},
+		{"Willow", "DC-2417", 6, false, model.CowStatusInFarm},
+		{"Ginger", "DC-2418", 4, true, model.CowStatusInFarm},
+		{"Honey", "DC-2419", 3, true, model.CowStatusInFarm},
+		{"Luna", "DC-2420", 5, true, model.CowStatusInFarm},
+		{"Annie", "DC-2421", 4, true, model.CowStatusInFarm},
+		{"Ruby", "DC-2422", 6, true, model.CowStatusInFarm},
+		{"Pearl", "DC-2423", 5, true, model.CowStatusInFarm},
+		{"Nora", "DC-2424", 4, true, model.CowStatusInFarm},
+		{"Olive", "DC-2425", 3, true, model.CowStatusInFarm},
 	}
 
 	ids := make([]string, 0, len(defs))
@@ -116,7 +115,6 @@ func seedCows(db *gorm.DB) []string {
 			Age:        d.age,
 			CanMilking: d.canMilking,
 			Status:     d.status,
-			Condition:  d.condition,
 		}
 		if err := db.Create(cow).Error; err != nil {
 			panic(err)

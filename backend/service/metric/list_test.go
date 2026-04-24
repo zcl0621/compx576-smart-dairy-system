@@ -17,7 +17,7 @@ import (
 func TestMetricListService_ReturnsAll(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "AllCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "AllCow", model.CowStatusInFarm)
 		now := time.Now()
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.5, now)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 72.0, now)
@@ -33,8 +33,8 @@ func TestMetricListService_ReturnsAll(t *testing.T) {
 func TestMetricListService_FilterByCowID(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c1 := testhelper.SeedCow(t, tx, "Cow1", model.CowStatusInFarm, model.CowConditionNormal)
-		c2 := testhelper.SeedCow(t, tx, "Cow2", model.CowStatusInFarm, model.CowConditionNormal)
+		c1 := testhelper.SeedCow(t, tx, "Cow1", model.CowStatusInFarm)
+		c2 := testhelper.SeedCow(t, tx, "Cow2", model.CowStatusInFarm)
 		now := time.Now()
 		testhelper.SeedMetric(t, tx, c1.ID, model.MetricTypeTemperature, 38.5, now)
 		testhelper.SeedMetric(t, tx, c1.ID, model.MetricTypeHeartRate, 72.0, now)
@@ -53,7 +53,7 @@ func TestMetricListService_FilterByCowID(t *testing.T) {
 func TestMetricListService_FilterByMetricType(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "TypeCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "TypeCow", model.CowStatusInFarm)
 		now := time.Now()
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.5, now)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.8, now)
@@ -72,7 +72,7 @@ func TestMetricListService_FilterByMetricType(t *testing.T) {
 func TestMetricListService_Pagination(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "PagCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "PagCow", model.CowStatusInFarm)
 		now := time.Now()
 		for i := 0; i < 5; i++ {
 			testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, float64(38+i), now)

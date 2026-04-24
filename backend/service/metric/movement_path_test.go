@@ -15,7 +15,7 @@ import (
 func TestMovementPathService_ReturnsPathPoints(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "PathCow", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "PathCow", model.CowStatusInFarm)
 		now := time.Now()
 
 		// seed 3 non-collinear positions: A -> B -> C
@@ -42,7 +42,7 @@ func TestMovementPathService_ReturnsPathPoints(t *testing.T) {
 func TestMovementPathService_DetectsStay(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "StayCow", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "StayCow", model.CowStatusInFarm)
 		now := time.Now()
 
 		// seed 3 points at same rounded location (within 5m) over 10 min
@@ -72,7 +72,7 @@ func TestMovementPathService_DetectsStay(t *testing.T) {
 func TestMovementPathService_EmptyData(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		cow := testhelper.SeedCow(t, tx, "EmptyCow", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "EmptyCow", model.CowStatusInFarm)
 
 		resp, err := metric.MovementPathService(&metric.MetricQuery{
 			CowID:       cow.ID,

@@ -26,3 +26,19 @@ func SendResetCode(toEmail, code string) error {
 
 	return sendEmail(context.Background(), client, params)
 }
+
+func SendAlertEmail(emails []string, cowName, title, severity, message string) error {
+	resendConfig := config.Get().Resend
+	client := resend.NewClient(resendConfig.APIKey)
+	params := &resend.SendEmailRequest{
+		From:    resendConfig.From,
+		To:      emails,
+		Subject: fmt.Sprintf("[Alert] %s — %s", severity, title),
+		Text:    fmt.Sprintf("Cow: %s\nAlert: %s\nSeverity: %s\nMessage: %s", cowName, title, severity, message),
+		Html: fmt.Sprintf(
+			"<p><strong>Cow:</strong> %s</p><p><strong>Alert:</strong> %s</p><p><strong>Severity:</strong> %s</p><p><strong>Message:</strong> %s</p>",
+			cowName, title, severity, message,
+		),
+	}
+	return sendEmail(context.Background(), client, params)
+}

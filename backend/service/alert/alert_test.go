@@ -16,7 +16,7 @@ import (
 func TestAlertList_All(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "ListCow", model.CowStatusInFarm, model.CowConditionWarning)
+		c := testhelper.SeedCow(t, tx, "ListCow", model.CowStatusInFarm)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityWarning, model.AlertStatusActive)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityCritical, model.AlertStatusActive)
 
@@ -30,8 +30,8 @@ func TestAlertList_All(t *testing.T) {
 func TestAlertList_FilterByCow(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c1 := testhelper.SeedCow(t, tx, "Cow1", model.CowStatusInFarm, model.CowConditionNormal)
-		c2 := testhelper.SeedCow(t, tx, "Cow2", model.CowStatusInFarm, model.CowConditionNormal)
+		c1 := testhelper.SeedCow(t, tx, "Cow1", model.CowStatusInFarm)
+		c2 := testhelper.SeedCow(t, tx, "Cow2", model.CowStatusInFarm)
 		testhelper.SeedAlert(t, tx, c1.ID, model.AlertSeverityWarning, model.AlertStatusActive)
 		testhelper.SeedAlert(t, tx, c2.ID, model.AlertSeverityCritical, model.AlertStatusActive)
 
@@ -46,7 +46,7 @@ func TestAlertList_FilterByCow(t *testing.T) {
 func TestAlertList_FilterBySeverity(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "SevCow", model.CowStatusInFarm, model.CowConditionCritical)
+		c := testhelper.SeedCow(t, tx, "SevCow", model.CowStatusInFarm)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityWarning, model.AlertStatusActive)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityCritical, model.AlertStatusActive)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityOffline, model.AlertStatusActive)
@@ -62,7 +62,7 @@ func TestAlertList_FilterBySeverity(t *testing.T) {
 func TestAlertList_ExcludesResolved(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "ResolvedCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "ResolvedCow", model.CowStatusInFarm)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityWarning, model.AlertStatusResolved)
 
 		resp, err := alert.ListService(&alertdto.ListQuery{CowID: c.ID})
@@ -75,7 +75,7 @@ func TestAlertList_ExcludesResolved(t *testing.T) {
 func TestAlertList_Pagination(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "PagCow", model.CowStatusInFarm, model.CowConditionWarning)
+		c := testhelper.SeedCow(t, tx, "PagCow", model.CowStatusInFarm)
 		for i := 0; i < 5; i++ {
 			testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityWarning, model.AlertStatusActive)
 		}
@@ -95,7 +95,7 @@ func TestAlertList_Pagination(t *testing.T) {
 func TestAlertSummary_Counts(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "SummaryCow", model.CowStatusInFarm, model.CowConditionCritical)
+		c := testhelper.SeedCow(t, tx, "SummaryCow", model.CowStatusInFarm)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityWarning, model.AlertStatusActive)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityWarning, model.AlertStatusActive)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityCritical, model.AlertStatusActive)

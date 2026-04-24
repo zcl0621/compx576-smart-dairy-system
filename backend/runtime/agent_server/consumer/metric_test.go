@@ -22,7 +22,7 @@ func TestMetricWriter_WritesToDB(t *testing.T) {
 		// init mq after WithTx flushes redis so the consumer group exists
 		require.NoError(t, mq.Init())
 
-		cow := testhelper.SeedCow(t, tx, "Echo", model.CowStatusInFarm, model.CowConditionNormal)
+		cow := testhelper.SeedCow(t, tx, "Echo", model.CowStatusInFarm)
 
 		// publish a metric
 		err := mq.Publish(map[string]string{

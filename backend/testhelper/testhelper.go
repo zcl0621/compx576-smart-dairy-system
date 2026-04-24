@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -22,6 +23,8 @@ import (
 )
 
 var setupOnce sync.Once
+
+var alertSeq uint64 // unique metric keys per SeedAlert call — avoids partial index conflicts
 
 // init config, logger and pg db once per test binary
 // change workdir to backend root so config.yaml is found
@@ -43,6 +46,9 @@ func SetupTestDB(t *testing.T) {
 		}
 		if err := pg.InitDB(); err != nil {
 			t.Fatalf("init db: %v", err)
+		}
+		if err := model.Migrate(pg.DB); err != nil {
+			t.Fatalf("migrate: %v", err)
 		}
 		if err := redisdb.InitRedis(); err != nil {
 			t.Fatalf("init redis: %v", err)
@@ -112,15 +118,14 @@ func SeedUser(t *testing.T, db *gorm.DB, username, email, password string) *mode
 }
 
 // seed cow and return model
-func SeedCow(t *testing.T, db *gorm.DB, name string, status model.CowStatus, condition model.CowCondition) *model.Cow {
+func SeedCow(t *testing.T, db *gorm.DB, name string, status model.CowStatus) *model.Cow {
 	t.Helper()
 	tag := fmt.Sprintf("TAG-%d", time.Now().UnixNano())
 	c := &model.Cow{
-		Name:      name,
-		Tag:       tag,
-		Age:       2,
-		Status:    status,
-		Condition: condition,
+		Name:   name,
+		Tag:    tag,
+		Age:    2,
+		Status: status,
 	}
 	if err := db.Create(c).Error; err != nil {
 		t.Fatalf("seed cow: %v", err)
@@ -152,9 +157,11 @@ func SeedMetric(t *testing.T, db *gorm.DB, cowID string, metricType model.Metric
 // seed alert and return model
 func SeedAlert(t *testing.T, db *gorm.DB, cowID string, severity model.AlertSeverity, status model.AlertStatus) *model.Alert {
 	t.Helper()
+	seq := atomic.AddUint64(&alertSeq, 1)
+	metricKey := model.MetricType(fmt.Sprintf("test_metric_%d", seq))
 	a := &model.Alert{
 		CowID:     cowID,
-		MetricKey: model.MetricTypeTemperature,
+		MetricKey: metricKey,
 		Title:     "test alert",
 		Message:   fmt.Sprintf("%s alert for %s", severity, cowID),
 		Severity:  severity,
@@ -162,6 +169,23 @@ func SeedAlert(t *testing.T, db *gorm.DB, cowID string, severity model.AlertSeve
 	}
 	if err := db.Create(a).Error; err != nil {
 		t.Fatalf("seed alert: %v", err)
+	}
+	return a
+}
+
+// SeedAlertForMetric seeds an alert with a specific metric key.
+func SeedAlertForMetric(t *testing.T, db *gorm.DB, cowID string, metricKey model.MetricType, severity model.AlertSeverity, status model.AlertStatus) *model.Alert {
+	t.Helper()
+	a := &model.Alert{
+		CowID:     cowID,
+		MetricKey: metricKey,
+		Title:     "test alert",
+		Message:   fmt.Sprintf("%s alert for %s", severity, cowID),
+		Severity:  severity,
+		Status:    status,
+	}
+	if err := db.Create(a).Error; err != nil {
+		t.Fatalf("seed alert for metric: %v", err)
 	}
 	return a
 }

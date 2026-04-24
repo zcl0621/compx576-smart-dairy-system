@@ -104,3 +104,9 @@ func UserDeleteService(r *user.DeleteRequest) error {
 	db = db.Where("id = ?", r.ID)
 	return db.Delete(&model.User{}).Error
 }
+
+func GetAllEmails() ([]string, error) {
+	var emails []string
+	err := pg.DB.Model(&model.User{}).Pluck("email", &emails).Error
+	return emails, err
+}

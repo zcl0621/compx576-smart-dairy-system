@@ -18,7 +18,7 @@ import (
 func TestTemperatureService_ReturnsData(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "TempCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "TempCow", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.5, time.Now())
 
 		resp, err := metric.TemperatureService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -35,8 +35,8 @@ func TestTemperatureService_ReturnsData(t *testing.T) {
 func TestTemperatureService_StatusWarning(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "TempWarn", model.CowStatusInFarm, model.CowConditionWarning)
-		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 39.5, time.Now())
+		c := testhelper.SeedCow(t, tx, "TempWarn", model.CowStatusInFarm)
+		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 39.6, time.Now())
 
 		resp, err := metric.TemperatureService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -48,8 +48,8 @@ func TestTemperatureService_StatusWarning(t *testing.T) {
 func TestTemperatureService_StatusCritical(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "TempCrit", model.CowStatusInFarm, model.CowConditionCritical)
-		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 40.1, time.Now())
+		c := testhelper.SeedCow(t, tx, "TempCrit", model.CowStatusInFarm)
+		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 40.6, time.Now())
 
 		resp, err := metric.TemperatureService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -61,7 +61,7 @@ func TestTemperatureService_StatusCritical(t *testing.T) {
 func TestTemperatureService_StatusOffline(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "TempOffline", model.CowStatusInFarm, model.CowConditionOffline)
+		c := testhelper.SeedCow(t, tx, "TempOffline", model.CowStatusInFarm)
 		// no metric here
 
 		resp, err := metric.TemperatureService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -76,7 +76,7 @@ func TestTemperatureService_StatusOffline(t *testing.T) {
 func TestTemperatureService_BadRange(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "RangeCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "RangeCow", model.CowStatusInFarm)
 
 		_, err := metric.TemperatureService(&cowdto.MetricQuery{CowID: c.ID, Range: "invalid"})
 
@@ -89,7 +89,7 @@ func TestTemperatureService_BadRange(t *testing.T) {
 func TestHeartRateService_StatusNormal(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "HRNormal", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "HRNormal", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 70.0, time.Now())
 
 		resp, err := metric.HeartRateService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -102,7 +102,7 @@ func TestHeartRateService_StatusNormal(t *testing.T) {
 func TestHeartRateService_StatusWarning_High(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "HRWarnHigh", model.CowStatusInFarm, model.CowConditionWarning)
+		c := testhelper.SeedCow(t, tx, "HRWarnHigh", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 95.0, time.Now())
 
 		resp, err := metric.HeartRateService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -115,7 +115,7 @@ func TestHeartRateService_StatusWarning_High(t *testing.T) {
 func TestHeartRateService_StatusCritical_High(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "HRCritHigh", model.CowStatusInFarm, model.CowConditionCritical)
+		c := testhelper.SeedCow(t, tx, "HRCritHigh", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 105.0, time.Now())
 
 		resp, err := metric.HeartRateService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -128,8 +128,8 @@ func TestHeartRateService_StatusCritical_High(t *testing.T) {
 func TestHeartRateService_StatusCritical_Low(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "HRCritLow", model.CowStatusInFarm, model.CowConditionCritical)
-		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 40.0, time.Now())
+		c := testhelper.SeedCow(t, tx, "HRCritLow", model.CowStatusInFarm)
+		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 37.0, time.Now())
 
 		resp, err := metric.HeartRateService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -143,7 +143,7 @@ func TestHeartRateService_StatusCritical_Low(t *testing.T) {
 func TestBloodOxygenService_StatusNormal(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "BONormal", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "BONormal", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeBloodOxygen, 97.0, time.Now())
 
 		resp, err := metric.BloodOxygenService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -156,7 +156,7 @@ func TestBloodOxygenService_StatusNormal(t *testing.T) {
 func TestBloodOxygenService_StatusWarning(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "BOWarning", model.CowStatusInFarm, model.CowConditionWarning)
+		c := testhelper.SeedCow(t, tx, "BOWarning", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeBloodOxygen, 93.0, time.Now())
 
 		resp, err := metric.BloodOxygenService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -169,8 +169,8 @@ func TestBloodOxygenService_StatusWarning(t *testing.T) {
 func TestBloodOxygenService_StatusCritical(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "BOCritical", model.CowStatusInFarm, model.CowConditionCritical)
-		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeBloodOxygen, 88.0, time.Now())
+		c := testhelper.SeedCow(t, tx, "BOCritical", model.CowStatusInFarm)
+		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeBloodOxygen, 87.0, time.Now())
 
 		resp, err := metric.BloodOxygenService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -184,7 +184,7 @@ func TestBloodOxygenService_StatusCritical(t *testing.T) {
 func TestMilkAmountService_SumAndAvg(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "MilkCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "MilkCow", model.CowStatusInFarm)
 		now := time.Now()
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeMilkAmount, 10.0, now.Add(-2*time.Hour))
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeMilkAmount, 12.0, now.Add(-1*time.Hour))
@@ -203,7 +203,7 @@ func TestMilkAmountService_SumAndAvg(t *testing.T) {
 func TestMovementService_PairLatLng(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "MoveCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "MoveCow", model.CowStatusInFarm)
 		now := time.Now()
 		// pair 2 lat lng points, 1 min apart
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeLatitude, -37.78, now.Add(-10*time.Minute))
@@ -224,7 +224,7 @@ func TestMovementService_PairLatLng(t *testing.T) {
 func TestMovementService_SinglePoint_Warning(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "MoveSingle", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "MoveSingle", model.CowStatusInFarm)
 		now := time.Now()
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeLatitude, -37.78, now)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeLongitude, 175.28, now)
@@ -239,7 +239,7 @@ func TestMovementService_SinglePoint_Warning(t *testing.T) {
 func TestMovementService_NoData_Offline(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "MoveNone", model.CowStatusInFarm, model.CowConditionOffline)
+		c := testhelper.SeedCow(t, tx, "MoveNone", model.CowStatusInFarm)
 
 		resp, err := metric.MovementService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -254,7 +254,7 @@ func TestMovementService_NoData_Offline(t *testing.T) {
 func TestTemperatureService_AllRange(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "RangeAll", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "RangeAll", model.CowStatusInFarm)
 		// seed old metric so all gets it
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.0, time.Now().Add(-48*time.Hour))
 
@@ -271,7 +271,7 @@ func TestTemperatureService_AllRange(t *testing.T) {
 func TestTemperatureService_7DRange(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "Range7D", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "Range7D", model.CowStatusInFarm)
 		// inside 7d
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.2, time.Now().Add(-3*24*time.Hour))
 		// outside 7d, should show in all only
@@ -291,7 +291,7 @@ func TestTemperatureService_7DRange(t *testing.T) {
 func TestTemperatureService_30DRange(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "Range30D", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "Range30D", model.CowStatusInFarm)
 		// inside 30d
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.1, time.Now().Add(-15*24*time.Hour))
 		// outside 30d
@@ -311,9 +311,9 @@ func TestTemperatureService_30DRange(t *testing.T) {
 func TestHeartRateService_StatusWarning_Low(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "HRWarnLow", model.CowStatusInFarm, model.CowConditionWarning)
-		// 46-50 is low warning, current <= 50 && current > 45
-		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 48.0, time.Now())
+		c := testhelper.SeedCow(t, tx, "HRWarnLow", model.CowStatusInFarm)
+		// 38-48 is low warning range (< HRWarnLow=48 but >= HRCritLow=38)
+		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 47.0, time.Now())
 
 		resp, err := metric.HeartRateService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -325,7 +325,7 @@ func TestHeartRateService_StatusWarning_Low(t *testing.T) {
 func TestMilkAmountService_NoData(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "DryMilkCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "DryMilkCow", model.CowStatusInFarm)
 
 		resp, err := metric.MilkAmountService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -340,7 +340,7 @@ func TestMilkAmountService_NoData(t *testing.T) {
 func TestMovementService_PairBeyondTolerance_Dropped(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "MoveTolerCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "MoveTolerCow", model.CowStatusInFarm)
 		now := time.Now()
 		// lat at t=0, lng comes 10 min later, drop it
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeLatitude, -37.78, now.Add(-20*time.Minute))
@@ -360,7 +360,7 @@ func TestMovementService_PairBeyondTolerance_Dropped(t *testing.T) {
 func TestWeightService_ReturnsData(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "WeightCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "WeightCow", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeWeight, 520.0, time.Now())
 
 		resp, err := metric.WeightService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
@@ -377,7 +377,7 @@ func TestWeightService_ReturnsData(t *testing.T) {
 func TestWeightService_NoData(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "EmptyWeightCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "EmptyWeightCow", model.CowStatusInFarm)
 
 		resp, err := metric.WeightService(&cowdto.MetricQuery{CowID: c.ID, Range: "24h"})
 
@@ -392,7 +392,7 @@ func TestWeightService_NoData(t *testing.T) {
 func TestWeightService_StatsCorrect(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "MultiWeightCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "MultiWeightCow", model.CowStatusInFarm)
 		now := time.Now()
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeWeight, 500.0, now.Add(-2*time.Hour))
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeWeight, 520.0, now.Add(-1*time.Hour))

@@ -19,11 +19,10 @@ func TestCowCreate_Success(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
 		err := cow.CowCreateService(&cowdto.CreateRequest{
-			Name:      "Bessie",
-			Tag:       "T-001",
-			Age:       3,
-			Status:    model.CowStatusInFarm,
-			Condition: model.CowConditionNormal,
+			Name:   "Bessie",
+			Tag:    "T-001",
+			Age:    3,
+			Status: model.CowStatusInFarm,
 		})
 
 		require.NoError(t, err)
@@ -33,8 +32,8 @@ func TestCowCreate_Success(t *testing.T) {
 func TestCowList_FilterByStatus(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		testhelper.SeedCow(t, tx, "InFarm1", model.CowStatusInFarm, model.CowConditionNormal)
-		testhelper.SeedCow(t, tx, "Sold1", model.CowStatusSold, model.CowConditionNormal)
+		testhelper.SeedCow(t, tx, "InFarm1", model.CowStatusInFarm)
+		testhelper.SeedCow(t, tx, "Sold1", model.CowStatusSold)
 
 		resp, err := cow.CowListService(&cowdto.ListQuery{Status: string(model.CowStatusInFarm)})
 
@@ -48,8 +47,9 @@ func TestCowList_FilterByStatus(t *testing.T) {
 func TestCowList_FilterByCondition(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		testhelper.SeedCow(t, tx, "Critical1", model.CowStatusInFarm, model.CowConditionCritical)
-		testhelper.SeedCow(t, tx, "Normal1", model.CowStatusInFarm, model.CowConditionNormal)
+		c1 := testhelper.SeedCow(t, tx, "Critical1", model.CowStatusInFarm)
+		testhelper.SeedCow(t, tx, "Normal1", model.CowStatusInFarm)
+		testhelper.SeedAlertForMetric(t, tx, c1.ID, model.MetricTypeTemperature, model.AlertSeverityCritical, model.AlertStatusActive)
 
 		resp, err := cow.CowListService(&cowdto.ListQuery{Condition: string(model.CowConditionCritical)})
 
@@ -64,15 +64,16 @@ func TestCowList_FilterByCondition(t *testing.T) {
 func TestCowList_SortByCondition(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		testhelper.SeedCow(t, tx, "OfflineCow", model.CowStatusInFarm, model.CowConditionOffline)
-		testhelper.SeedCow(t, tx, "CriticalCow", model.CowStatusInFarm, model.CowConditionCritical)
-		testhelper.SeedCow(t, tx, "NormalCow", model.CowStatusInFarm, model.CowConditionNormal)
+		offline := testhelper.SeedCow(t, tx, "OfflineCow", model.CowStatusInFarm)
+		critical := testhelper.SeedCow(t, tx, "CriticalCow", model.CowStatusInFarm)
+		testhelper.SeedCow(t, tx, "NormalCow", model.CowStatusInFarm)
+		testhelper.SeedAlertForMetric(t, tx, offline.ID, model.MetricTypeDevice, model.AlertSeverityOffline, model.AlertStatusActive)
+		testhelper.SeedAlertForMetric(t, tx, critical.ID, model.MetricTypeTemperature, model.AlertSeverityCritical, model.AlertStatusActive)
 
 		resp, err := cow.CowListService(&cowdto.ListQuery{Sort: "condition"})
 
 		require.NoError(t, err)
 		require.GreaterOrEqual(t, len(resp.List), 3)
-		// critical comes before normal and offline
 		conditionOrder := map[model.CowCondition]int{
 			model.CowConditionCritical: 1,
 			model.CowConditionWarning:  2,
@@ -90,7 +91,7 @@ func TestCowList_SortByCondition(t *testing.T) {
 func TestCowInfo_WithLatestWeight(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "WeightCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "WeightCow", model.CowStatusInFarm)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeWeight, 450.5, nowFunc())
 
 		resp, err := cow.CowInfoService(&cowdto.InfoQuery{ID: c.ID})
@@ -104,7 +105,7 @@ func TestCowInfo_WithLatestWeight(t *testing.T) {
 func TestCowInfo_NoMetrics(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "NoMetricCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "NoMetricCow", model.CowStatusInFarm)
 
 		resp, err := cow.CowInfoService(&cowdto.InfoQuery{ID: c.ID})
 
@@ -116,15 +117,14 @@ func TestCowInfo_NoMetrics(t *testing.T) {
 func TestCowUpdate_Success(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "OldName", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "OldName", model.CowStatusInFarm)
 
 		err := cow.CowUpdateService(&cowdto.UpdateRequest{
-			ID:        c.ID,
-			Name:      "NewName",
-			Tag:       c.Tag,
-			Age:       5,
-			Status:    model.CowStatusInFarm,
-			Condition: model.CowConditionWarning,
+			ID:     c.ID,
+			Name:   "NewName",
+			Tag:    c.Tag,
+			Age:    5,
+			Status: model.CowStatusInFarm,
 		})
 		require.NoError(t, err)
 
@@ -132,15 +132,14 @@ func TestCowUpdate_Success(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "NewName", resp.Name)
 		assert.Equal(t, 5, resp.Age)
-		assert.Equal(t, model.CowConditionWarning, resp.Condition)
 	})
 }
 
 func TestCowList_SearchByName(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		testhelper.SeedCow(t, tx, "Findme", model.CowStatusInFarm, model.CowConditionNormal)
-		testhelper.SeedCow(t, tx, "Other", model.CowStatusInFarm, model.CowConditionNormal)
+		testhelper.SeedCow(t, tx, "Findme", model.CowStatusInFarm)
+		testhelper.SeedCow(t, tx, "Other", model.CowStatusInFarm)
 
 		resp, err := cow.CowListService(&cowdto.ListQuery{Name: "Findme"})
 
@@ -155,8 +154,8 @@ func TestCowList_SearchByName(t *testing.T) {
 func TestCowList_SortByUpdatedAt(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		testhelper.SeedCow(t, tx, "SortCow1", model.CowStatusInFarm, model.CowConditionNormal)
-		testhelper.SeedCow(t, tx, "SortCow2", model.CowStatusInFarm, model.CowConditionNormal)
+		testhelper.SeedCow(t, tx, "SortCow1", model.CowStatusInFarm)
+		testhelper.SeedCow(t, tx, "SortCow2", model.CowStatusInFarm)
 
 		// updated_at is default, just check no error
 		resp, err := cow.CowListService(&cowdto.ListQuery{Sort: "updated_at"})
@@ -183,14 +182,13 @@ func TestCowInfo_NotFound(t *testing.T) {
 func TestCowCreate_DuplicateTag(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "First", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "First", model.CowStatusInFarm)
 
 		err := cow.CowCreateService(&cowdto.CreateRequest{
-			Name:      "Second",
-			Tag:       c.Tag, // keep same tag
-			Age:       2,
-			Status:    model.CowStatusInFarm,
-			Condition: model.CowConditionNormal,
+			Name:   "Second",
+			Tag:    c.Tag, // keep same tag
+			Age:    2,
+			Status: model.CowStatusInFarm,
 		})
 
 		assert.Error(t, err)
@@ -201,11 +199,10 @@ func TestCowUpdate_NotFound(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
 		err := cow.CowUpdateService(&cowdto.UpdateRequest{
-			ID:        "nonexistent-cow-id",
-			Name:      "Ghost",
-			Tag:       "GHOST-TAG",
-			Status:    model.CowStatusInFarm,
-			Condition: model.CowConditionNormal,
+			ID:     "nonexistent-cow-id",
+			Name:   "Ghost",
+			Tag:    "GHOST-TAG",
+			Status: model.CowStatusInFarm,
 		})
 
 		assert.Error(t, err)

@@ -23,20 +23,18 @@ type MetricQuery struct {
 }
 
 type CreateRequest struct {
-	Name       string             `json:"name" binding:"required"`
-	Tag        string             `json:"tag" binding:"required"`
-	Age        int                `json:"age"`
-	CanMilking bool               `json:"can_milking"`
-	Status     model.CowStatus    `json:"status"`
-	Condition  model.CowCondition `json:"condition"`
+	Name       string          `json:"name" binding:"required"`
+	Tag        string          `json:"tag" binding:"required"`
+	Age        int             `json:"age"`
+	CanMilking bool            `json:"can_milking"`
+	Status     model.CowStatus `json:"status"`
 }
 
 type UpdateRequest struct {
-	ID         string             `json:"id" binding:"required"`
-	Name       string             `json:"name" binding:"required"`
-	Tag        string             `json:"tag" binding:"required"`
-	Age        int                `json:"age"`
-	CanMilking bool               `json:"can_milking"`
-	Status     model.CowStatus    `json:"status"`
-	Condition  model.CowCondition `json:"condition"`
+	ID         string          `json:"id" binding:"required"`
+	Name       string          `json:"name" binding:"required"`
+	Tag        string          `json:"tag" binding:"required"`
+	Age        int             `json:"age"`
+	CanMilking bool            `json:"can_milking"`
+	Status     model.CowStatus `json:"status"`
 }

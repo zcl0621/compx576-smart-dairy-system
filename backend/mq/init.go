@@ -11,13 +11,19 @@ import (
 
 const StreamName = "metrics_stream"
 const GroupMetricWriter = "metric_writer"
+const GroupAlertEvaluator = "alert_evaluator"
 
 func Init() error {
 	client := redisdb.GetClient()
 	ctx := context.Background()
 
-	// create consumer group, MKSTREAM creates the stream if missing
 	err := client.XGroupCreateMkStream(ctx, StreamName, GroupMetricWriter, "0").Err()
+	if err != nil && !strings.HasPrefix(err.Error(), "BUSYGROUP") {
+		return err
+	}
+
+	// "$" means only process new messages — avoids spurious alerts on restart
+	err = client.XGroupCreateMkStream(ctx, StreamName, GroupAlertEvaluator, "$").Err()
 	if err != nil && !strings.HasPrefix(err.Error(), "BUSYGROUP") {
 		return err
 	}

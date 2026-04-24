@@ -9,6 +9,7 @@ import (
 	projectlog "github.com/zcl0621/compx576-smart-dairy-system/log"
 	"github.com/zcl0621/compx576-smart-dairy-system/model"
 	"github.com/zcl0621/compx576-smart-dairy-system/util"
+	alertservice "github.com/zcl0621/compx576-smart-dairy-system/service/alert"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -439,9 +440,9 @@ func statusForTemperature(rows []metricRow) model.ReportMetricStatus {
 	}
 	current := rows[len(rows)-1].MetricValue
 	switch {
-	case current >= 40:
+	case current > alertservice.TempCritHigh || current < alertservice.TempCritLow:
 		return model.ReportMetricStatusCritical
-	case current >= 39:
+	case current > alertservice.TempWarnHigh || current < alertservice.TempWarnLow:
 		return model.ReportMetricStatusWarning
 	default:
 		return model.ReportMetricStatusNormal
@@ -454,9 +455,9 @@ func statusForHeartRate(rows []metricRow) model.ReportMetricStatus {
 	}
 	current := rows[len(rows)-1].MetricValue
 	switch {
-	case current >= 100 || current <= 45:
+	case current > alertservice.HRCritHigh || current < alertservice.HRCritLow:
 		return model.ReportMetricStatusCritical
-	case current >= 90 || current <= 50:
+	case current > alertservice.HRWarnHigh || current < alertservice.HRWarnLow:
 		return model.ReportMetricStatusWarning
 	default:
 		return model.ReportMetricStatusNormal
@@ -469,9 +470,9 @@ func statusForBloodOxygen(rows []metricRow) model.ReportMetricStatus {
 	}
 	current := rows[len(rows)-1].MetricValue
 	switch {
-	case current < 90:
+	case current < alertservice.BOCrit:
 		return model.ReportMetricStatusCritical
-	case current < 95:
+	case current < alertservice.BOWarn:
 		return model.ReportMetricStatusWarning
 	default:
 		return model.ReportMetricStatusNormal

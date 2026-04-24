@@ -8,14 +8,14 @@ import 'api_provider.dart';
 
 // ── dashboard ──
 
-final dashboardSummaryProvider = FutureProvider<DashboardSummary>((ref) async {
+final dashboardSummaryProvider = FutureProvider.autoDispose<DashboardSummary>((ref) async {
   final api = ref.watch(apiClientProvider);
   final json = await api.get('/api/dashboard/summary');
   return DashboardSummary.fromJson(json);
 });
 
 final dashboardListProvider =
-    FutureProvider.family<PaginatedList<DashboardCowItem>, int>(
+    FutureProvider.autoDispose.family<PaginatedList<DashboardCowItem>, int>(
   (ref, page) async {
     final api = ref.watch(apiClientProvider);
     final json = await api.get('/api/dashboard/list', query: {
@@ -189,7 +189,7 @@ final movementPathProvider =
 
 // ── alert ──
 
-final alertSummaryProvider = FutureProvider<AlertSummary>((ref) async {
+final alertSummaryProvider = FutureProvider.autoDispose<AlertSummary>((ref) async {
   final api = ref.watch(apiClientProvider);
   final json = await api.get('/api/alert/summary');
   return AlertSummary.fromJson(json);
@@ -213,7 +213,7 @@ class AlertListParams {
 }
 
 final alertListProvider =
-    FutureProvider.family<PaginatedList<AlertItem>, AlertListParams>(
+    FutureProvider.autoDispose.family<PaginatedList<AlertItem>, AlertListParams>(
   (ref, params) async {
     final api = ref.watch(apiClientProvider);
     final query = <String, String>{
@@ -236,7 +236,7 @@ final alertListProvider =
 );
 
 // active alerts for top bar bell (status=active, up to 5)
-final activeAlertsProvider = FutureProvider<List<AlertItem>>((ref) async {
+final activeAlertsProvider = FutureProvider.autoDispose<List<AlertItem>>((ref) async {
   final api = ref.watch(apiClientProvider);
   final json = await api.get('/api/alert/list', query: {
     'status': 'active',

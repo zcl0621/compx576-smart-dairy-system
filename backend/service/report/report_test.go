@@ -16,7 +16,7 @@ import (
 func TestReportList_ReturnsSeededReports(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "Bessie", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "Bessie", model.CowStatusInFarm)
 		testhelper.SeedReport(t, tx, c.ID)
 		testhelper.SeedReport(t, tx, c.ID)
 
@@ -34,7 +34,7 @@ func TestReportList_ReturnsSeededReports(t *testing.T) {
 func TestReportList_CowNameJoin(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "Daisy", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "Daisy", model.CowStatusInFarm)
 		testhelper.SeedReport(t, tx, c.ID)
 
 		q := &reportdto.ListQuery{}
@@ -59,7 +59,7 @@ func TestReportList_CowNameJoin(t *testing.T) {
 func TestReportList_OrderedByCreatedAtDesc(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "Molly", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "Molly", model.CowStatusInFarm)
 		r1 := testhelper.SeedReport(t, tx, c.ID)
 		r2 := testhelper.SeedReport(t, tx, c.ID)
 
@@ -86,7 +86,7 @@ func TestReportList_OrderedByCreatedAtDesc(t *testing.T) {
 func TestReportList_Pagination(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "PagCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "PagCow", model.CowStatusInFarm)
 		for i := 0; i < 3; i++ {
 			testhelper.SeedReport(t, tx, c.ID)
 		}
@@ -106,7 +106,7 @@ func TestReportList_Pagination(t *testing.T) {
 func TestReportLatest_Success(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "LatestCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "LatestCow", model.CowStatusInFarm)
 		r1 := testhelper.SeedReport(t, tx, c.ID)
 		r2 := testhelper.SeedReport(t, tx, c.ID)
 

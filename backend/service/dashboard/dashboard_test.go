@@ -18,13 +18,22 @@ func nowFunc() time.Time { return time.Now() }
 func TestDashboardSummary_Counts(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		testhelper.SeedCow(t, tx, "N1", model.CowStatusInFarm, model.CowConditionNormal)
-		testhelper.SeedCow(t, tx, "N2", model.CowStatusInFarm, model.CowConditionNormal)
-		testhelper.SeedCow(t, tx, "W1", model.CowStatusInFarm, model.CowConditionWarning)
-		testhelper.SeedCow(t, tx, "C1", model.CowStatusInFarm, model.CowConditionCritical)
-		testhelper.SeedCow(t, tx, "O1", model.CowStatusInFarm, model.CowConditionOffline)
+		n1 := testhelper.SeedCow(t, tx, "N1", model.CowStatusInFarm)
+		n2 := testhelper.SeedCow(t, tx, "N2", model.CowStatusInFarm)
+		w1 := testhelper.SeedCow(t, tx, "W1", model.CowStatusInFarm)
+		c1 := testhelper.SeedCow(t, tx, "C1", model.CowStatusInFarm)
+		o1 := testhelper.SeedCow(t, tx, "O1", model.CowStatusInFarm)
 		// sold cow must not show in count
-		testhelper.SeedCow(t, tx, "Sold", model.CowStatusSold, model.CowConditionNormal)
+		testhelper.SeedCow(t, tx, "Sold", model.CowStatusSold)
+
+		// suppress "declared but not used" for n1, n2 (they stay normal — no alerts needed)
+		_ = n1
+		_ = n2
+
+		// set conditions via active alerts
+		testhelper.SeedAlertForMetric(t, tx, w1.ID, model.MetricTypeHeartRate, model.AlertSeverityWarning, model.AlertStatusActive)
+		testhelper.SeedAlertForMetric(t, tx, c1.ID, model.MetricTypeTemperature, model.AlertSeverityCritical, model.AlertStatusActive)
+		testhelper.SeedAlertForMetric(t, tx, o1.ID, model.MetricTypeDevice, model.AlertSeverityOffline, model.AlertStatusActive)
 
 		resp, err := dashboard.SummaryService()
 
@@ -44,7 +53,7 @@ func TestDashboardSummary_SoldExcluded(t *testing.T) {
 		baseline, err := dashboard.SummaryService()
 		require.NoError(t, err)
 
-		testhelper.SeedCow(t, tx, "SoldExtra", model.CowStatusSold, model.CowConditionNormal)
+		testhelper.SeedCow(t, tx, "SoldExtra", model.CowStatusSold)
 
 		resp, err := dashboard.SummaryService()
 		require.NoError(t, err)
@@ -57,7 +66,7 @@ func TestDashboardSummary_SoldExcluded(t *testing.T) {
 func TestDashboardList_WithMetrics(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "MetricCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "MetricCow", model.CowStatusInFarm)
 		now := nowFunc()
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeTemperature, 38.5, now)
 		testhelper.SeedMetric(t, tx, c.ID, model.MetricTypeHeartRate, 72.0, now)
@@ -87,7 +96,7 @@ func TestDashboardList_WithMetrics(t *testing.T) {
 func TestDashboardList_NoMetrics(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "NoMetricCow", model.CowStatusInFarm, model.CowConditionNormal)
+		c := testhelper.SeedCow(t, tx, "NoMetricCow", model.CowStatusInFarm)
 
 		resp, err := dashboard.ListService(&dashboarddto.ListQuery{})
 
@@ -109,7 +118,7 @@ func TestDashboardList_NoMetrics(t *testing.T) {
 func TestDashboardList_AlertMessage(t *testing.T) {
 	testhelper.SetupTestDB(t)
 	testhelper.WithTx(t, func(tx *gorm.DB) {
-		c := testhelper.SeedCow(t, tx, "AlertCow", model.CowStatusInFarm, model.CowConditionCritical)
+		c := testhelper.SeedCow(t, tx, "AlertCow", model.CowStatusInFarm)
 		testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityWarning, model.AlertStatusActive)
 		a := testhelper.SeedAlert(t, tx, c.ID, model.AlertSeverityCritical, model.AlertStatusActive)
 

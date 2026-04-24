@@ -175,3 +175,18 @@ func TestUserUpdatePassword_NotFound(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func TestGetAllEmails(t *testing.T) {
+	testhelper.SetupTestDB(t)
+	testhelper.WithTx(t, func(tx *gorm.DB) {
+		testhelper.SeedUser(t, tx, "alice", "alice@test.com", "password")
+		testhelper.SeedUser(t, tx, "bob", "bob@test.com", "password")
+
+		emails, err := user.GetAllEmails()
+
+		require.NoError(t, err)
+		assert.GreaterOrEqual(t, len(emails), 2)
+		assert.Contains(t, emails, "alice@test.com")
+		assert.Contains(t, emails, "bob@test.com")
+	})
+}
