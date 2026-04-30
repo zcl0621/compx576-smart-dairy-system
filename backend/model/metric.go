@@ -22,6 +22,7 @@ const (
 	MetricTypeMilkingDuration MetricType = "milking_duration"
 	MetricTypeWeight          MetricType = "weight"
 	MetricTypeDevice          MetricType = "device"
+	MetricTypeReportFailure   MetricType = "report_failure"
 )
 
 const (

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"sync"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -46,6 +47,13 @@ type AgentConfig struct {
 	AgentServerURL string `yaml:"agent_server_url"`
 }
 
+type DeepseekConfig struct {
+	APIKey  string        `yaml:"api_key"`
+	BaseURL string        `yaml:"base_url"`
+	Model   string        `yaml:"model"`
+	Timeout time.Duration `yaml:"timeout"`
+}
+
 type Config struct {
 	App         AppConfig         `yaml:"app"`
 	PG          PGConfig          `yaml:"pg"`
@@ -54,6 +62,7 @@ type Config struct {
 	JWT         JWTConfig         `yaml:"jwt"`
 	AgentServer AgentServerConfig `yaml:"agent_server"`
 	Agent       AgentConfig       `yaml:"agent"`
+	Deepseek    DeepseekConfig    `yaml:"deepseek"`
 }
 
 var (

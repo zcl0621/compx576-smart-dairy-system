@@ -1,0 +1,27 @@
+app:
+  env: dev
+pg:
+  host: 127.0.0.1
+  port: 5432
+  user: postgresql
+  password: your_pg_password
+  dbname: smart_dairy
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 0
+resend:
+  api_key: "re_your_resend_api_key"
+  from: "onboarding@resend.dev"
+jwt:
+  secret: your_jwt_secret
+agent_server:
+  port: 8081
+agent:
+  agent_server_url: "http://127.0.0.1:8081"
+deepseek:
+  api_key: "sk-your_deepseek_api_key"
+  base_url: "https://api.deepseek.com/v1"
+  model: "deepseek-v4-flash"
+  timeout: 30s
