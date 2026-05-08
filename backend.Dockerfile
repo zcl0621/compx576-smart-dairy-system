@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/report ./cmd/report
 FROM alpine:3.20
 
 WORKDIR /app
-RUN adduser -D -u 10001 appuser
+RUN apk add --no-cache tzdata && adduser -D -u 10001 appuser
 COPY --from=build /out/ /app/
 USER appuser
 
