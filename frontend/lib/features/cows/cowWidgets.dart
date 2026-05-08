@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/models/appModels.dart';
@@ -288,7 +289,12 @@ class CowMobileCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Farm status: ${cowStatusLabel(row.status)}'),
           const SizedBox(height: 4),
-          Text('Agent token: ${shortAgentToken(row.agentToken)}'),
+          Row(
+            children: [
+              const Text('Agent token: '),
+              AgentTokenText(token: row.agentToken),
+            ],
+          ),
           const SizedBox(height: 4),
           Text('Health status: ${cowConditionLabel(row.condition)}'),
           const SizedBox(height: 4),
@@ -307,13 +313,47 @@ class AgentTokenText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: token.isEmpty ? 'No token' : token,
-      child: SelectableText(
-        shortAgentToken(token),
-        maxLines: 1,
-        style: const TextStyle(fontSize: 12, color: AppColors.mutedForeground),
+      message: token.isEmpty ? 'No token' : 'Click to copy',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: token.isEmpty ? null : () => _copyToken(context),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 3),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  shortAgentToken(token),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.mutedForeground,
+                  ),
+                ),
+              ),
+              if (token.isNotEmpty) ...[
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.copy_rounded,
+                  size: 13,
+                  color: AppColors.mutedForeground,
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  Future<void> _copyToken(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: token));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Agent token copied')));
   }
 }
 
