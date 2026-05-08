@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-server
+  namespace: compx576
+spec:
+  selector:
+    app: web-server
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+  namespace: compx576
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      labels:
+        app: web-server
+    spec:
+      containers:
+        - name: web-server
+          image: ghcr.io/OWNER/compx576-backend:IMAGE_TAG
+          command: ["/app/web_server"]
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: compx576-config

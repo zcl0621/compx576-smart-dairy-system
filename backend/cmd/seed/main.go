@@ -51,7 +51,7 @@ func seedUsers(db *gorm.DB) {
 	}{
 		{"admin", "admin@smartdairy.local", "password123"},
 		{"farmworker", "worker@smartdairy.local", "password123"},
-		{"zcl0621", "zcl0621@hotmail.com", "zxc123456"},
+		{"zcl0621", "zcl0621@users.noreply.github.com", "zxc123456"},
 	}
 
 	for _, u := range users {
@@ -109,9 +109,14 @@ func seedCows(db *gorm.DB) []string {
 
 	ids := make([]string, 0, len(defs))
 	for _, d := range defs {
+		token, err := util.GenerateAgentToken()
+		if err != nil {
+			panic(err)
+		}
 		cow := &model.Cow{
 			Name:       d.name,
 			Tag:        d.tag,
+			AgentToken: token,
 			Age:        d.age,
 			CanMilking: d.canMilking,
 			Status:     d.status,

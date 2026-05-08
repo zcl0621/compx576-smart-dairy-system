@@ -121,11 +121,16 @@ func SeedUser(t *testing.T, db *gorm.DB, username, email, password string) *mode
 func SeedCow(t *testing.T, db *gorm.DB, name string, status model.CowStatus) *model.Cow {
 	t.Helper()
 	tag := fmt.Sprintf("TAG-%d", time.Now().UnixNano())
+	token, err := util.GenerateAgentToken()
+	if err != nil {
+		t.Fatalf("agent token: %v", err)
+	}
 	c := &model.Cow{
-		Name:   name,
-		Tag:    tag,
-		Age:    2,
-		Status: status,
+		Name:       name,
+		Tag:        tag,
+		AgentToken: token,
+		Age:        2,
+		Status:     status,
 	}
 	if err := db.Create(c).Error; err != nil {
 		t.Fatalf("seed cow: %v", err)

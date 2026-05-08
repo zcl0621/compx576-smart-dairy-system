@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zcl0621/compx576-smart-dairy-system/db/pg"
 	cowdto "github.com/zcl0621/compx576-smart-dairy-system/dto/cow"
 	"github.com/zcl0621/compx576-smart-dairy-system/model"
 	"github.com/zcl0621/compx576-smart-dairy-system/service/cow"
@@ -26,6 +27,27 @@ func TestCowCreate_Success(t *testing.T) {
 		})
 
 		require.NoError(t, err)
+	})
+}
+
+func TestCowCreateService_GeneratesAgentToken(t *testing.T) {
+	testhelper.SetupTestDB(t)
+	testhelper.WithTx(t, func(tx *gorm.DB) {
+		req := &cowdto.CreateRequest{
+			Name:       "Token Cow",
+			Tag:        "TOKEN-001",
+			Age:        4,
+			CanMilking: true,
+			Status:     model.CowStatusInFarm,
+		}
+
+		err := cow.CowCreateService(req)
+		require.NoError(t, err)
+
+		var c model.Cow
+		err = pg.DB.Where("tag = ?", "TOKEN-001").First(&c).Error
+		require.NoError(t, err)
+		assert.NotEmpty(t, c.AgentToken)
 	})
 }
 

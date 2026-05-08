@@ -1,44 +1,20 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
-	"sync"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zcl0621/compx576-smart-dairy-system/db/pg"
+	"github.com/zcl0621/compx576-smart-dairy-system/db/redis"
 	projectlog "github.com/zcl0621/compx576-smart-dairy-system/log"
-	"github.com/zcl0621/compx576-smart-dairy-system/middleware"
 	"github.com/zcl0621/compx576-smart-dairy-system/model"
 	"github.com/zcl0621/compx576-smart-dairy-system/mq"
 	"go.uber.org/zap"
 )
-
-// tag to cow_id cache so we don't hit db on every metric
-var (
-	tagCache   = map[string]string{}
-	tagCacheMu sync.RWMutex
-)
-
-func resolveCowID(tag string) (string, bool) {
-	tagCacheMu.RLock()
-	id, ok := tagCache[tag]
-	tagCacheMu.RUnlock()
-	if ok {
-		return id, true
-	}
-
-	var cow model.Cow
-	if err := pg.DB.Where("tag = ?", tag).First(&cow).Error; err != nil {
-		return "", false
-	}
-
-	tagCacheMu.Lock()
-	tagCache[tag] = cow.ID
-	tagCacheMu.Unlock()
-	return cow.ID, true
-}
 
 type Handler struct{}
 
@@ -48,27 +24,6 @@ func NewHandler() *Handler {
 
 func (h *Handler) Health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
-}
-
-// Token generates a cow JWT for device auth
-func (h *Handler) Token(c *gin.Context) {
-	cowID := c.Query("cow_id")
-	if cowID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cow_id is required"})
-		return
-	}
-
-	token, expiresAt, err := middleware.GenerateCowToken(cowID)
-	if err != nil {
-		projectlog.L().Error("generate cow token failed", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "token generation failed"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"token":      token,
-		"expires_at": expiresAt.Unix(),
-	})
 }
 
 type metricRequest struct {
@@ -115,8 +70,13 @@ func (h *Handler) Metric(c *gin.Context) {
 		return
 	}
 
-	// check cow_id matches JWT
-	tokenCowID, err := middleware.GetAuthCowID(c)
+	token, err := bearerToken(c.GetHeader("Authorization"))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "bad token"})
+		return
+	}
+
+	tokenCowID, err := resolveCowIDForToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "bad token"})
 		return
@@ -139,15 +99,8 @@ func (h *Handler) Metric(c *gin.Context) {
 		return
 	}
 
-	// agent sends cow tag, resolve to cow_id for db storage
-	cowID, ok := resolveCowID(req.CowID)
-	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cow not found"})
-		return
-	}
-
 	fields := map[string]string{
-		"cow_id":       cowID,
+		"cow_id":       req.CowID,
 		"source":       req.Source,
 		"metric_type":  req.MetricType,
 		"metric_value": strconv.FormatFloat(*req.MetricValue, 'f', 2, 64),
@@ -162,4 +115,27 @@ func (h *Handler) Metric(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
+func resolveCowIDForToken(token string) (string, error) {
+	key := "agent_token:" + token
+	if cached, err := redis.Get(key); err == nil && cached != "" {
+		return cached, nil
+	}
+
+	var cow model.Cow
+	if err := pg.DB.Where("agent_token = ?", token).First(&cow).Error; err != nil {
+		return "", err
+	}
+
+	_ = redis.Set(key, cow.ID, 24*time.Hour)
+	return cow.ID, nil
+}
+
+func bearerToken(header string) (string, error) {
+	parts := strings.SplitN(header, " ", 2)
+	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" || parts[1] == "" {
+		return "", errors.New("bad token")
+	}
+	return parts[1], nil
 }

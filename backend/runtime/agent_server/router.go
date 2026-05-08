@@ -14,11 +14,7 @@ func NewRouter() *gin.Engine {
 	router.GET("/health", h.Health)
 
 	api := router.Group("/api")
-	api.POST("/token", h.Token)
-
-	protected := api.Group("")
-	protected.Use(middleware.NeedCowAuth())
-	protected.POST("/metric", h.Metric)
+	api.POST("/metric", h.Metric)
 
 	return router
 }

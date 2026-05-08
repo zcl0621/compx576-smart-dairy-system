@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: compx576-config
+  namespace: compx576
+data:
+  config.yaml: |
+    app:
+      env: prod
+    pg:
+      host: postgres
+      port: 5432
+      user: smartdairy
+      password: change-me
+      dbname: smart_dairy
+    redis:
+      host: redis
+      port: 6379
+      password: ""
+      db: 0
+    resend:
+      api_key: change-me
+      from: onboarding@resend.dev
+    jwt:
+      secret: change-me
+    agent_server:
+      port: 8081
+    agent:
+      agent_server_url: http://agent-server:8081
+    deepseek:
+      api_key: change-me
+      base_url: https://api.deepseek.com/v1
+      model: deepseek-v4-flash
+      timeout: 30s
+  agent_dc_2401_cow_id: change-me
+  agent_dc_2401_token: change-me
+  agent_dc_2402_cow_id: change-me
+  agent_dc_2402_token: change-me
+  agent_dc_2403_cow_id: change-me
+  agent_dc_2403_token: change-me
+  agent_dc_2404_cow_id: change-me
+  agent_dc_2404_token: change-me
+  agent_dc_2405_cow_id: change-me
+  agent_dc_2405_token: change-me

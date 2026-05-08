@@ -33,15 +33,11 @@ func TestIntegration_PostMetricEndToEnd(t *testing.T) {
 
 		router := agent_server.NewRouter()
 
-		// 1. get token using tag (like real agent)
+		// 1. token endpoint is not public
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("POST", "/api/token?cow_id="+cow.Tag, nil)
 		router.ServeHTTP(w, req)
-		require.Equal(t, http.StatusOK, w.Code)
-
-		var tokenResp map[string]interface{}
-		require.NoError(t, json.Unmarshal(w.Body.Bytes(), &tokenResp))
-		token := tokenResp["token"].(string)
+		require.Equal(t, http.StatusNotFound, w.Code)
 
 		// 2. start consumer
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -55,7 +51,7 @@ func TestIntegration_PostMetricEndToEnd(t *testing.T) {
 
 		// 3. post metric using tag (agent server resolves to cow_id)
 		body, _ := json.Marshal(map[string]interface{}{
-			"cow_id":       cow.Tag,
+			"cow_id":       cow.ID,
 			"source":       "cow_agent",
 			"metric_type":  "heart_rate",
 			"metric_value": 75.0,
@@ -65,7 +61,7 @@ func TestIntegration_PostMetricEndToEnd(t *testing.T) {
 		w = httptest.NewRecorder()
 		req, _ = http.NewRequest("POST", "/api/metric", bytes.NewReader(body))
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("Authorization", "Bearer "+cow.AgentToken)
 		router.ServeHTTP(w, req)
 		require.Equal(t, http.StatusOK, w.Code)
 

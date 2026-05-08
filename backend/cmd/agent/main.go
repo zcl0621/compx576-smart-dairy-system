@@ -18,11 +18,16 @@ func main() {
 	host := flag.String("host", "127.0.0.1", "agent server host")
 	port := flag.Int("port", 8081, "agent server port")
 	cowID := flag.String("cow", "", "cow_id to simulate (required)")
+	token := flag.String("token", "", "agent token for this cow (required)")
 	status := flag.String("status", "health", "health status: health / unhealth / ill")
 	flag.Parse()
 
 	if *cowID == "" {
 		fmt.Fprintln(os.Stderr, "--cow flag is required")
+		os.Exit(1)
+	}
+	if *token == "" {
+		fmt.Fprintln(os.Stderr, "--token flag is required")
 		os.Exit(1)
 	}
 
@@ -42,18 +47,12 @@ func main() {
 		zap.String("server", baseURL),
 	)
 
-	// get JWT token from agent server
-	token, err := agent.FetchToken(baseURL, *cowID)
-	if err != nil {
-		projectlog.L().Fatal("failed to get token", zap.Error(err))
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go agent.StartHealthAgent(ctx, *cowID, baseURL, token, *status)
-	go agent.StartMilkingAgent(ctx, *cowID, baseURL, token)
-	go agent.StartWeightAgent(ctx, *cowID, baseURL, token)
+	go agent.StartHealthAgent(ctx, *cowID, baseURL, *token, *status)
+	go agent.StartMilkingAgent(ctx, *cowID, baseURL, *token)
+	go agent.StartWeightAgent(ctx, *cowID, baseURL, *token)
 
 	projectlog.L().Info("all agents running", zap.String("cow_id", *cowID))
 

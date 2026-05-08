@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: report
+  namespace: compx576
+spec:
+  schedule: "0 6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: report
+              image: ghcr.io/OWNER/compx576-backend:IMAGE_TAG
+              command: ["/app/report"]
+              volumeMounts:
+                - name: config
+                  mountPath: /app/config.yaml
+                  subPath: config.yaml
+          volumes:
+            - name: config
+              configMap:
+                name: compx576-config

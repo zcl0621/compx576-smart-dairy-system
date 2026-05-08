@@ -13,6 +13,7 @@ type ListItem struct {
 	UpdatedAt  time.Time          `json:"updated_at" gorm:"column:updated_at"`
 	Name       string             `json:"name" gorm:"column:name"`
 	Tag        string             `json:"tag" gorm:"column:tag"`
+	AgentToken string             `json:"agent_token" gorm:"column:agent_token"`
 	Age        int                `json:"age" gorm:"column:age"`
 	CanMilking bool               `json:"can_milking" gorm:"column:can_milking"`
 	Status     model.CowStatus    `json:"status" gorm:"column:status"`
@@ -30,6 +31,7 @@ type InfoResponse struct {
 	UpdatedAt   time.Time          `json:"updated_at" gorm:"column:updated_at"`
 	Name        string             `json:"name" gorm:"column:name"`
 	Tag         string             `json:"tag" gorm:"column:tag"`
+	AgentToken  string             `json:"agent_token" gorm:"column:agent_token"`
 	Age         int                `json:"age" gorm:"column:age"`
 	CanMilking  bool               `json:"can_milking" gorm:"column:can_milking"`
 	Status      model.CowStatus    `json:"status" gorm:"column:status"`

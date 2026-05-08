@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
-	"net/url"
 	"sync"
 	"time"
 
@@ -131,29 +129,4 @@ func postMetric(baseURL, token, cowID, source, metricType string, value float64,
 			zap.Int("status", resp.StatusCode),
 		)
 	}
-}
-
-// FetchToken calls agent server to get a cow JWT
-func FetchToken(baseURL, cowID string) (string, error) {
-	resp, err := http.Post(fmt.Sprintf("%s/api/token?cow_id=%s", baseURL, url.QueryEscape(cowID)), "", nil)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("token request failed: status %d", resp.StatusCode)
-	}
-
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", err
-	}
-
-	token, ok := result["token"].(string)
-	if !ok || token == "" {
-		return "", fmt.Errorf("empty token in response")
-	}
-
-	return token, nil
 }

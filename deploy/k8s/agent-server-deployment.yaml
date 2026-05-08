@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-server
+  namespace: compx576
+spec:
+  selector:
+    app: agent-server
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-server
+  namespace: compx576
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-server
+  template:
+    metadata:
+      labels:
+        app: agent-server
+    spec:
+      containers:
+        - name: agent-server
+          image: ghcr.io/OWNER/compx576-backend:IMAGE_TAG
+          command: ["/app/agent_server"]
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: compx576-config

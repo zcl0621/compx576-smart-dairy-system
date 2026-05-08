@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-dc-2405
+  namespace: compx576
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-dc-2405
+  template:
+    metadata:
+      labels:
+        app: agent-dc-2405
+    spec:
+      containers:
+        - name: agent
+          image: ghcr.io/OWNER/compx576-backend:IMAGE_TAG
+          command: ["/app/agent"]
+          args: ["--host", "agent-server", "--port", "8081", "--cow", "$(COW_ID)", "--token", "$(AGENT_TOKEN)", "--status", "ill"]
+          env:
+            - name: COW_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: compx576-config
+                  key: agent_dc_2405_cow_id
+            - name: AGENT_TOKEN
+              valueFrom:
+                configMapKeyRef:
+                  name: compx576-config
+                  key: agent_dc_2405_token
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: compx576-config

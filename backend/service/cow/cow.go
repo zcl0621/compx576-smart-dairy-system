@@ -5,6 +5,7 @@ import (
 	"github.com/zcl0621/compx576-smart-dairy-system/dto/common"
 	cowdto "github.com/zcl0621/compx576-smart-dairy-system/dto/cow"
 	"github.com/zcl0621/compx576-smart-dairy-system/model"
+	"github.com/zcl0621/compx576-smart-dairy-system/util"
 	"gorm.io/gorm"
 )
 
@@ -80,9 +81,15 @@ func CowInfoService(r *cowdto.InfoQuery) (*cowdto.InfoResponse, error) {
 }
 
 func CowCreateService(r *cowdto.CreateRequest) error {
+	token, err := util.GenerateAgentToken()
+	if err != nil {
+		return err
+	}
+
 	item := model.Cow{
 		Name:       r.Name,
 		Tag:        r.Tag,
+		AgentToken: token,
 		Age:        r.Age,
 		CanMilking: r.CanMilking,
 		Status:     r.Status,
