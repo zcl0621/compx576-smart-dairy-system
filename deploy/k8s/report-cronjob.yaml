@@ -9,6 +9,8 @@ spec:
     spec:
       template:
         spec:
+          imagePullSecrets:
+            - name: ghcr-secret
           restartPolicy: OnFailure
           containers:
             - name: report

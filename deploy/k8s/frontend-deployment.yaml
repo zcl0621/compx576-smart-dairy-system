@@ -26,6 +26,8 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: frontend
           image: ghcr.io/OWNER/compx576-frontend:IMAGE_TAG

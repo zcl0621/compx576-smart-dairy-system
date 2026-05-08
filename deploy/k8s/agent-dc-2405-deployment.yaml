@@ -13,6 +13,8 @@ spec:
       labels:
         app: agent-dc-2405
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: agent
           image: ghcr.io/OWNER/compx576-backend:IMAGE_TAG
