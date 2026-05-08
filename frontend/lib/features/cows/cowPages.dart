@@ -25,13 +25,13 @@ class _CowsListPageState extends ConsumerState<CowsListPage> {
   int page = 1;
 
   CowListParams get _params => CowListParams(
-        page: page,
-        pageSize: 10,
-        name: query.isEmpty ? null : query,
-        condition: condition?.name,
-        status: status?.name,
-        sort: sortBy == 'Name' ? 'name' : 'updated_at',
-      );
+    page: page,
+    pageSize: 10,
+    name: query.isEmpty ? null : query,
+    condition: condition?.name,
+    status: status?.name,
+    sort: sortBy == 'Name' ? 'name' : 'updated_at',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -225,6 +225,7 @@ class _CowsListPageState extends ConsumerState<CowsListPage> {
                               id: cow.id,
                               tag: cow.tag,
                               name: cow.name,
+                              agentToken: cow.agent_token,
                               canMilking: cow.can_milking,
                               status: cow.status,
                               condition: cow.condition,
@@ -283,7 +284,9 @@ class _CowsListPageState extends ConsumerState<CowsListPage> {
                         result.total == 0
                             ? 'Showing 0 results'
                             : 'Showing ${(page - 1) * 10 + 1} to ${(page - 1) * 10 + items.length} of ${result.total} results',
-                        style: const TextStyle(color: AppColors.mutedForeground),
+                        style: const TextStyle(
+                          color: AppColors.mutedForeground,
+                        ),
                       ),
                     ),
                     if (result.total > 0)
@@ -351,7 +354,9 @@ class EditCowPage extends ConsumerWidget {
     return cowAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/cows'));
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => context.go('/cows'),
+        );
         return const SizedBox.shrink();
       },
       data: (cow) => CowFormPage(
@@ -649,7 +654,9 @@ class _CowDetailPageState extends ConsumerState<CowDetailPage> {
     return cowAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/cows'));
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => context.go('/cows'),
+        );
         return const SizedBox.shrink();
       },
       data: (cow) => _buildDetail(context, cow, width),
@@ -724,10 +731,8 @@ class _CowDetailPageState extends ConsumerState<CowDetailPage> {
             ),
             const SizedBox(height: 16),
             alertsAsync.when(
-              loading: () => const LoadingStateCard(
-                message: 'Loading alerts',
-                lines: 2,
-              ),
+              loading: () =>
+                  const LoadingStateCard(message: 'Loading alerts', lines: 2),
               error: (e, _) => EmptyStateCard(message: 'Failed to load: $e'),
               data: (cowAlerts) => DetailCardFrame(
                 child: cowAlerts.isEmpty
@@ -755,10 +760,8 @@ class _CowDetailPageState extends ConsumerState<CowDetailPage> {
             ),
             const SizedBox(height: 16),
             reportAsync.when(
-              loading: () => const LoadingStateCard(
-                message: 'Loading report',
-                lines: 3,
-              ),
+              loading: () =>
+                  const LoadingStateCard(message: 'Loading report', lines: 3),
               error: (e, _) => EmptyStateCard(message: 'Failed to load: $e'),
               data: (report) => DetailCardFrame(
                 child: report == null
@@ -880,11 +883,15 @@ class _CowDetailPageState extends ConsumerState<CowDetailPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Failed to load map data',
-                            style: TextStyle(color: AppColors.mutedForeground)),
+                        Text(
+                          'Failed to load map data',
+                          style: TextStyle(color: AppColors.mutedForeground),
+                        ),
                         const SizedBox(height: 8),
                         TextButton(
-                          onPressed: () => ref.invalidate(movementPathProvider(metricParams)),
+                          onPressed: () => ref.invalidate(
+                            movementPathProvider(metricParams),
+                          ),
                           child: const Text('Retry'),
                         ),
                       ],
@@ -925,10 +932,7 @@ class _MetricChart extends StatelessWidget {
       data: (data) => ChartCard(
         title: title,
         values: data.series.map((p) => p.value).toList(),
-        labels: cowChartLabels(
-          data.series.map((p) => p.time).toList(),
-          range,
-        ),
+        labels: cowChartLabels(data.series.map((p) => p.time).toList(), range),
         color: color,
         minY: minY,
         maxY: maxY,
@@ -952,19 +956,14 @@ class _MilkChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return asyncValue.when(
-      loading: () => const LoadingStateCard(
-        message: 'Loading Milk Production',
-        lines: 3,
-      ),
+      loading: () =>
+          const LoadingStateCard(message: 'Loading Milk Production', lines: 3),
       error: (e, _) =>
           const EmptyStateCard(message: 'Failed to load Milk Production'),
       data: (data) => ChartCard(
         title: 'Milk Production',
         values: data.series.map((p) => p.value).toList(),
-        labels: cowChartLabels(
-          data.series.map((p) => p.time).toList(),
-          range,
-        ),
+        labels: cowChartLabels(data.series.map((p) => p.time).toList(), range),
         color: AppColors.warning,
         fractionDigits: 0,
       ),
@@ -990,10 +989,7 @@ class _MovementChart extends StatelessWidget {
       data: (data) => ChartCard(
         title: 'Movement Distance (m)',
         values: data.series.map((p) => p.distance_m).toList(),
-        labels: cowChartLabels(
-          data.series.map((p) => p.time).toList(),
-          range,
-        ),
+        labels: cowChartLabels(data.series.map((p) => p.time).toList(), range),
         color: AppColors.offline,
         minY: 0.0,
         fractionDigits: 0,
@@ -1001,4 +997,3 @@ class _MovementChart extends StatelessWidget {
     );
   }
 }
-

@@ -11,32 +11,31 @@ enum AlertStatus { active, resolved }
 enum MetricRange { h24, d7, d30, all }
 
 CowStatus parseCowStatus(String? v) => CowStatus.values.firstWhere(
-      (e) => e.name == v,
-      orElse: () => CowStatus.in_farm,
-    );
+  (e) => e.name == v,
+  orElse: () => CowStatus.in_farm,
+);
 
 CowCondition parseCowCondition(String? v) => CowCondition.values.firstWhere(
-      (e) => e.name == v,
-      orElse: () => CowCondition.normal,
-    );
+  (e) => e.name == v,
+  orElse: () => CowCondition.normal,
+);
 
-AlertSeverity parseAlertSeverity(String? v) =>
-    AlertSeverity.values.firstWhere(
-      (e) => e.name == v,
-      orElse: () => AlertSeverity.warning,
-    );
+AlertSeverity parseAlertSeverity(String? v) => AlertSeverity.values.firstWhere(
+  (e) => e.name == v,
+  orElse: () => AlertSeverity.warning,
+);
 
 AlertStatus parseAlertStatus(String? v) => AlertStatus.values.firstWhere(
-      (e) => e.name == v,
-      orElse: () => AlertStatus.active,
-    );
+  (e) => e.name == v,
+  orElse: () => AlertStatus.active,
+);
 
 String metricRangeToQuery(MetricRange r) => switch (r) {
-      MetricRange.h24 => '24h',
-      MetricRange.d7 => '7d',
-      MetricRange.d30 => '30d',
-      MetricRange.all => 'all',
-    };
+  MetricRange.h24 => '24h',
+  MetricRange.d7 => '7d',
+  MetricRange.d30 => '30d',
+  MetricRange.all => 'all',
+};
 
 class DashboardSummary {
   const DashboardSummary({
@@ -87,7 +86,8 @@ class DashboardCowItem {
       heart_rate: (json['heart_rate'] as num?)?.toDouble(),
       blood_oxygen: (json['blood_oxygen'] as num?)?.toDouble(),
       alert_message: json['alert_message'] as String?,
-      updated_at: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+      updated_at:
+          DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
     );
   }
@@ -118,6 +118,7 @@ class Cow {
     this.temperature,
     this.heart_rate,
     this.blood_oxygen,
+    this.agent_token = '',
   });
 
   /// parse from cow/info response
@@ -126,11 +127,13 @@ class Cow {
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       tag: json['tag'] as String? ?? '',
+      agent_token: json['agent_token'] as String? ?? '',
       age: (json['age'] as num?)?.toInt() ?? 0,
       can_milking: json['can_milking'] as bool? ?? false,
       status: parseCowStatus(json['status'] as String?),
       condition: parseCowCondition(json['condition'] as String?),
-      updated_at: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+      updated_at:
+          DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
       weight: (json['weight'] as num?)?.toDouble(),
       temperature: (json['temperature'] as num?)?.toDouble(),
@@ -146,36 +149,39 @@ class Cow {
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       tag: json['tag'] as String? ?? '',
+      agent_token: json['agent_token'] as String? ?? '',
       age: (json['age'] as num?)?.toInt() ?? 0,
       can_milking: json['can_milking'] as bool? ?? false,
       status: parseCowStatus(json['status'] as String?),
       condition: parseCowCondition(json['condition'] as String?),
-      updated_at: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+      updated_at:
+          DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
       weight: null,
     );
   }
 
   Map<String, dynamic> toCreateJson() => {
-        'name': name,
-        'tag': tag,
-        'age': age,
-        'can_milking': can_milking,
-        'status': status.name,
-      };
+    'name': name,
+    'tag': tag,
+    'age': age,
+    'can_milking': can_milking,
+    'status': status.name,
+  };
 
   Map<String, dynamic> toUpdateJson() => {
-        'id': id,
-        'name': name,
-        'tag': tag,
-        'age': age,
-        'can_milking': can_milking,
-        'status': status.name,
-      };
+    'id': id,
+    'name': name,
+    'tag': tag,
+    'age': age,
+    'can_milking': can_milking,
+    'status': status.name,
+  };
 
   final String id;
   final String name;
   final String tag;
+  final String agent_token;
   final int age;
   final bool can_milking;
   final CowStatus status;
@@ -212,9 +218,9 @@ class AlertItem {
       message: json['message'] as String? ?? '',
       severity: parseAlertSeverity(json['severity'] as String?),
       status: parseAlertStatus(json['status'] as String?),
-      resolved_at:
-          DateTime.tryParse(json['resolved_at']?.toString() ?? ''),
-      updated_at: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+      resolved_at: DateTime.tryParse(json['resolved_at']?.toString() ?? ''),
+      updated_at:
+          DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
     );
   }
@@ -283,16 +289,16 @@ class ReportItem {
       cow_name: json['cow_name'] as String? ?? '',
       period_start:
           DateTime.tryParse(json['period_start']?.toString() ?? '') ??
-              DateTime.now(),
+          DateTime.now(),
       period_end:
           DateTime.tryParse(json['period_end']?.toString() ?? '') ??
-              DateTime.now(),
+          DateTime.now(),
       summary: json['summary'] as String? ?? '',
       score: (json['score'] as num?)?.toDouble() ?? 0,
       details: detailsStr,
       created_at:
           DateTime.tryParse(json['created_at']?.toString() ?? '') ??
-              DateTime.now(),
+          DateTime.now(),
     );
   }
 
@@ -323,10 +329,10 @@ class UserItem {
       email: json['email'] as String? ?? '',
       created_at:
           DateTime.tryParse(json['created_at']?.toString() ?? '') ??
-              DateTime.now(),
+          DateTime.now(),
       updated_at:
           DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
-              DateTime.now(),
+          DateTime.now(),
     );
   }
 
@@ -391,7 +397,8 @@ class LoginResult {
   factory LoginResult.fromJson(Map<String, dynamic> json) {
     return LoginResult(
       token: json['token'] as String? ?? '',
-      expiresAt: DateTime.tryParse(json['expires_at']?.toString() ?? '') ??
+      expiresAt:
+          DateTime.tryParse(json['expires_at']?.toString() ?? '') ??
           DateTime.now(),
       user: UserItem.fromJson(json['user'] as Map<String, dynamic>? ?? {}),
     );
@@ -532,7 +539,9 @@ class MetricListItem {
       metricType: json['metric_type']?.toString() ?? '',
       metricValue: (json['metric_value'] as num?)?.toDouble() ?? 0,
       unit: json['unit']?.toString() ?? '',
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
     );
   }
 

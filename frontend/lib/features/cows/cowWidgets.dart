@@ -10,6 +10,7 @@ class CowTableRowData {
     required this.id,
     required this.tag,
     required this.name,
+    required this.agentToken,
     required this.canMilking,
     required this.status,
     required this.condition,
@@ -19,6 +20,7 @@ class CowTableRowData {
   final String id;
   final String tag;
   final String name;
+  final String agentToken;
   final bool canMilking;
   final CowStatus status;
   final CowCondition condition;
@@ -98,19 +100,23 @@ class CowsTable extends StatelessWidget {
                 child: Text('Name', style: _CowHeaderText.style),
               ),
               Expanded(
-                flex: 12,
+                flex: 11,
                 child: Text('Can Milking', style: _CowHeaderText.style),
               ),
               Expanded(
-                flex: 14,
+                flex: 16,
+                child: Text('Agent Token', style: _CowHeaderText.style),
+              ),
+              Expanded(
+                flex: 13,
                 child: Text('Farm Status', style: _CowHeaderText.style),
               ),
               Expanded(
-                flex: 14,
+                flex: 13,
                 child: Text('Health Status', style: _CowHeaderText.style),
               ),
               Expanded(
-                flex: 18,
+                flex: 16,
                 child: Text('Last Updated', style: _CowHeaderText.style),
               ),
               Expanded(
@@ -150,15 +156,16 @@ class CowDesktopRow extends StatelessWidget {
           Expanded(flex: 13, child: Text(row.tag)),
           Expanded(flex: 10, child: Text(row.name)),
           Expanded(
-            flex: 12,
+            flex: 11,
             child: Align(
               alignment: Alignment.centerLeft,
               child: MilkingPill(value: row.canMilking),
             ),
           ),
-          Expanded(flex: 14, child: Text(cowStatusLabel(row.status))),
+          Expanded(flex: 16, child: AgentTokenText(token: row.agentToken)),
+          Expanded(flex: 13, child: Text(cowStatusLabel(row.status))),
           Expanded(
-            flex: 14,
+            flex: 13,
             child: Row(
               children: [
                 Container(
@@ -177,7 +184,7 @@ class CowDesktopRow extends StatelessWidget {
               ],
             ),
           ),
-          Expanded(flex: 18, child: Text(cowDateTimeText(row.updatedAt))),
+          Expanded(flex: 16, child: Text(cowDateTimeText(row.updatedAt))),
           Expanded(
             flex: 10,
             child: Wrap(
@@ -281,10 +288,30 @@ class CowMobileCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Farm status: ${cowStatusLabel(row.status)}'),
           const SizedBox(height: 4),
+          Text('Agent token: ${shortAgentToken(row.agentToken)}'),
+          const SizedBox(height: 4),
           Text('Health status: ${cowConditionLabel(row.condition)}'),
           const SizedBox(height: 4),
           Text('Last updated: ${cowDateTimeText(row.updatedAt)}'),
         ],
+      ),
+    );
+  }
+}
+
+class AgentTokenText extends StatelessWidget {
+  const AgentTokenText({super.key, required this.token});
+
+  final String token;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: token.isEmpty ? 'No token' : token,
+      child: SelectableText(
+        shortAgentToken(token),
+        maxLines: 1,
+        style: const TextStyle(fontSize: 12, color: AppColors.mutedForeground),
       ),
     );
   }
@@ -985,6 +1012,12 @@ String cowDateTimeText(DateTime value) {
   final minute = value.minute.toString().padLeft(2, '0');
   final second = value.second.toString().padLeft(2, '0');
   return '${value.year}/$month/$day $hour:$minute:$second';
+}
+
+String shortAgentToken(String token) {
+  if (token.isEmpty) return '-';
+  if (token.length <= 14) return token;
+  return '${token.substring(0, 6)}...${token.substring(token.length - 6)}';
 }
 
 List<String> cowChartLabels(List<DateTime> times, MetricRange range) {
