@@ -4,7 +4,7 @@ metadata:
   name: letsencrypt-cloudflare
 spec:
   acme:
-    email: change-me@example.com
+    email: zcl0621@users.noreply.github.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-cloudflare-account-key

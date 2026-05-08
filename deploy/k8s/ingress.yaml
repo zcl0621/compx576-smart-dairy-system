@@ -9,10 +9,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - example.com
+        - smart-farm.app
       secretName: compx576-tls
   rules:
-    - host: example.com
+    - host: smart-farm.app
       http:
         paths:
           - path: /
@@ -34,10 +34,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - example.com
+        - smart-farm.app
       secretName: compx576-tls
   rules:
-    - host: example.com
+    - host: smart-farm.app
       http:
         paths:
           - path: /api
@@ -61,10 +61,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - example.com
+        - smart-farm.app
       secretName: compx576-tls
   rules:
-    - host: example.com
+    - host: smart-farm.app
       http:
         paths:
           - path: /agent(/|$)(.*)
