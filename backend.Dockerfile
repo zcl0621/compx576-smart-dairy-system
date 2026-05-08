@@ -1,4 +1,4 @@
-FROM golang:1.25.1-alpine AS build
+FROM golang:1.25.1-bookworm AS build
 
 WORKDIR /src
 COPY backend/go.mod backend/go.sum ./
@@ -10,10 +10,13 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/agent_server ./cmd/ag
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/agent ./cmd/agent
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/report ./cmd/report
 
-FROM alpine:3.20
+FROM debian:bookworm-slim
 
 WORKDIR /app
-RUN apk add --no-cache tzdata && adduser -D -u 10001 appuser
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata \
+    && useradd -r -u 10001 -g users appuser \
+    && rm -rf /var/lib/apt/lists/*
 COPY --from=build /out/ /app/
 USER appuser
 

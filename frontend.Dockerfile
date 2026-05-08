@@ -8,6 +8,6 @@ COPY frontend/ ./
 ARG API_BASE_URL=/
 RUN flutter build web --release --dart-define=API_BASE_URL=${API_BASE_URL}
 
-FROM nginx:1.27-alpine
+FROM nginx:1.27
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /src/build/web /usr/share/nginx/html
