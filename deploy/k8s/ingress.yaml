@@ -73,6 +73,44 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: compx576-api-compat
+  namespace: compx576
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /api/$2
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - smart-farm.app
+        - "*.smart-farm.app"
+      secretName: compx576-tls
+  rules:
+    - host: smart-farm.app
+      http:
+        paths:
+          - path: /api/api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: web-server
+                port:
+                  number: 8080
+    - host: www.smart-farm.app
+      http:
+        paths:
+          - path: /api/api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: web-server
+                port:
+                  number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   name: compx576-agent-api
   namespace: compx576
   annotations:
