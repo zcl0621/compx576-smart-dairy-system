@@ -10,9 +10,20 @@ spec:
   tls:
     - hosts:
         - smart-farm.app
+        - "*.smart-farm.app"
       secretName: compx576-tls
   rules:
     - host: smart-farm.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+    - host: www.smart-farm.app
       http:
         paths:
           - path: /
@@ -35,6 +46,7 @@ spec:
   tls:
     - hosts:
         - smart-farm.app
+        - "*.smart-farm.app"
       secretName: compx576-tls
   rules:
     - host: smart-farm.app
@@ -62,6 +74,7 @@ spec:
   tls:
     - hosts:
         - smart-farm.app
+        - "*.smart-farm.app"
       secretName: compx576-tls
   rules:
     - host: smart-farm.app
