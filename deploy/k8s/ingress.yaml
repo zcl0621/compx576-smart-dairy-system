@@ -59,6 +59,16 @@ spec:
                 name: web-server
                 port:
                   number: 8080
+    - host: www.smart-farm.app
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: web-server
+                port:
+                  number: 8080
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -78,6 +88,16 @@ spec:
       secretName: compx576-tls
   rules:
     - host: smart-farm.app
+      http:
+        paths:
+          - path: /agent(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: agent-server
+                port:
+                  number: 8081
+    - host: www.smart-farm.app
       http:
         paths:
           - path: /agent(/|$)(.*)
