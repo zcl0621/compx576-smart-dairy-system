@@ -23,7 +23,7 @@ Set:
 
 ```bash
 export GHCR_OWNER=<owner>
-export API_BASE_URL=https://<domain>/api
+export API_BASE_URL=https://<domain>
 ```
 
 Run a script to deploy that component:
