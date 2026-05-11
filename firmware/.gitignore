@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+firmware-bin/*.bin
+.python-version
+
+# device-specific secrets (use config.example.py as template)
+src/config.py
